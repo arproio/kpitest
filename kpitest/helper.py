@@ -177,10 +177,57 @@ def get_utcdate(datestr='20171021143901'):
     else:
         print("Headers:{}".format(ret.headers))
 
+def import_file_xml():
+    url = "https://gateway.desheng.io/Thingworx/Importer"
+
+    querystring = {"purpose":"import","usedefaultdataprovider":"false","WithSubsystems":"false"}
+    # make sure don't include "content-type" in header. it will be set by request directly.
+    headers = {
+        'appkey': "84ce8ad3-e081-4d01-9af0-f6fef4156362",
+        'accept': "application/json",
+        'x-xsrf-token': "TWX-XSRF-TOKEN-VALUE",
+        'cache-control': "no-cache"
+        }
+
+    with open('/Users/desheng/Downloads/Things_myPythonThing.xml', 'rb') as f:
+        multiple_files={
+            'file':('Things_myPythonThing.xml',f,'application/xml')
+        }
+        #both methods work
+        ret = requests.request("POST",url=url, headers=headers, params=querystring, files=multiple_files)
+        #ret = requests.post(url, files=multiple_files,params=querystring,headers=headers)
+
+        print("Import Status Code:{}".format(ret.status_code))
+        print(ret.text)
+
+def import_file_twx():
+    url = "https://gateway.desheng.io/Thingworx/Importer"
+
+    querystring = {"purpose":"import","usedefaultdataprovider":"false","WithSubsystems":"false"}
+
+    headers = {
+        'appkey': "84ce8ad3-e081-4d01-9af0-f6fef4156362",
+        'accept': "application/json",
+        'x-xsrf-token': "TWX-XSRF-TOKEN-VALUE",
+        'cache-control': "no-cache"
+        }
+
+    with open('/Users/desheng/Downloads/Things_myPythonThing.twx', 'rb') as f:
+        multiple_files={
+            'file':('Things_myPythonThing.twx',f,'application/octet-stream')
+        }
+        ret = requests.request("POST",url=url, headers=headers, params=querystring, files=multiple_files)
+        #ret = requests.post(url, files=multiple_files,params=querystring,headers=headers)
+
+        print("Import Status Code:{}".format(ret.status_code))
+        print(ret.text)
+
 
 if __name__=='__main__':
     #get_things()
-    create_thing()
+    #create_thing()
     #delete_thing()
     #delete_thing_direct()
     #get_utcdate('20170902143901')
+    #import_file_xml()
+    import_file_twx()
