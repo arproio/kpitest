@@ -72,12 +72,11 @@ class TestClass:
         testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
         url = testServer.get_thing_service('Alert_Management_Util','RetrieveConfiguredAlertsByLineId')
 
-        jsonstr='''{"LineInfo": [
+        jsonbody={"LineInfo": [
             {"LineId": "LineId1", "LineName": "LineName1"},
             {"LineId":"LineId2", "LineName": "LineName2"}
             ]
-        }'''
-        jsonbody=json.loads(jsonstr)
+        }
         logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
         ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=False)
         logging.info("test LineID with LineId1 and LineId2, status_code:{}, text:{}".format(ret.status_code,
