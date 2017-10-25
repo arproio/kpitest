@@ -1,0 +1,6 @@
+{
+    "server":"device1-dev.digital.sealedair.com",
+    "port":443,
+    "protocol":"https",
+    "appKey": "8212ffee-837f-4035-904e-ad5e93fdaab1"
+}

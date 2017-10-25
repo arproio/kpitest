@@ -1,0 +1,6 @@
+{
+    "server":"gateway.desheng.io",
+    "port":443,
+    "protocol":"https",
+    "appKey": "84ce8ad3-e081-4d01-9af0-f6fef4156362"
+}
