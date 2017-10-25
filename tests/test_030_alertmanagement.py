@@ -6,20 +6,21 @@ import json
 import logging
 
 from kpitest.thingworx import  ThingworxServer
+from .conftest import log_testcase,log_ret,log_input
 
 #@pytest.mark.incremental
 class TestClass:
-    def test_RetrieveAllAlertsByUserId(self, configurationfile,configurationpath):
-        testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
+    @log_testcase
+    def test_RetrieveAllAlertsByUserId(self, testServer):
         url = testServer.get_thing_service('Alert_Management_Util','RetrieveAllAlertsByUserId')
 
         jsonbody={
             "UserId":"Administrator",
             "HistoricalDays":30
         }
-        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=False)
-        logging.info("test test_RetrieveAllAlertsByUserId id:Administrator, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert(ret.status_code == 200)
         data = json.loads(ret.text)
@@ -28,16 +29,16 @@ class TestClass:
         jsonbody={
             "UserId":"FakeUser"
         }
-        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=False)
-        logging.info("test test_RetrieveAllAlertsByUserId id:FakeUser, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert (ret.status_code == 200)
         data = json.loads(ret.text)
         assert (len(data['rows'])==0)
 
-    def test_RetrieveConfiguredAlertsByAssetId(self, configurationfile,configurationpath):
-        testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
+    @log_testcase
+    def test_RetrieveConfiguredAlertsByAssetId(self, testServer):
         url = testServer.get_thing_service('Alert_Management_Util','RetrieveConfiguredAlertsByAssetId')
 
         jsonbody={
@@ -46,9 +47,9 @@ class TestClass:
                 {"assetId":"asset2", "lineId": "line2", "LineName": "linename2"}
             ]
         }
-        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=False)
-        logging.info("test assetInfo with asset1 and asset2, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert(ret.status_code == 200)
         data = json.loads(ret.text)
@@ -60,16 +61,16 @@ class TestClass:
                 {"assetId": "fake2", "lineId": "line2", "LineName": "linename2"}
             ]
         }
-        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=False)
-        logging.info("test assetInfo with fake1 and fake2, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert (ret.status_code == 200)
         data = json.loads(ret.text)
         assert (len(data['rows'])==0)
 
-    def test_RetrieveConfiguredAlertsByLineId(self, configurationfile,configurationpath):
-        testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
+    @log_testcase
+    def test_RetrieveConfiguredAlertsByLineId(self, testServer):
         url = testServer.get_thing_service('Alert_Management_Util','RetrieveConfiguredAlertsByLineId')
 
         jsonbody={"LineInfo": [
@@ -77,10 +78,9 @@ class TestClass:
             {"LineId":"LineId2", "LineName": "LineName2"}
             ]
         }
-        logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
-        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=False)
-        logging.info("test LineID with LineId1 and LineId2, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert(ret.status_code == 200)
         data = json.loads(ret.text)
@@ -91,17 +91,16 @@ class TestClass:
             {"LineId":"Fake02", "LineName": "LineName2"}
             ]
         }
-        logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
-        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=False)
-        logging.info("test LineID with fake1 and fake2, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert (ret.status_code == 200)
         data = json.loads(ret.text)
         assert (len(data['rows'])==0)
 
-    def test_SubscribeToAlertByUserIdAssetId(self, configurationfile,configurationpath):
-        testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
+    @log_testcase
+    def test_SubscribeToAlertByUserIdAssetId(self, testServer):
         url = testServer.get_thing_service('Alert_Management_Util','SubscribeToAlertByUserIdAssetId')
 
         jsonbody={"SubscriptionInfo": [
@@ -109,10 +108,9 @@ class TestClass:
              "alertId": "Asset_RT_RTTFT_VR8600E_0724366--param_sealvoltage--Voltagetoohigh",
              "assetId": "Asset_RT_RTTFT_VR8600E_0724366"}
         ]}
-        logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
-        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=False)
-        logging.info("test SubscriptionInfo with p54284, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert(ret.status_code == 200)
 
@@ -121,15 +119,14 @@ class TestClass:
              "alertId": "Asset_RT_RTTFT_VR8600E_0724366--param_sealvoltage--Voltagetoohigh",
              "assetId": "Asset_RT_RTTFT_VR8600E_0724366"}
         ]}
-        logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
-        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=False)
-        logging.info("test SubscriptionInfo with fake, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert (ret.status_code == 500)
 
-    def test_SubscribeToAlertByUserIdLineId(self, configurationfile,configurationpath):
-        testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
+    @log_testcase
+    def test_SubscribeToAlertByUserIdLineId(self, testServer):
         url = testServer.get_thing_service('Alert_Management_Util','SubscribeToAlertByUserIdLineId')
 
         jsonbody={
@@ -139,10 +136,9 @@ class TestClass:
                     "alertId":"Asset_RT_RTTFT_VR8600E_0724366--param_sealvoltage--Voltagetoohigh--1--p54284",
                     "lineId": "1"}
             ]}
-        logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
-        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=False)
-        logging.info("test SubscriptionInfo with p54284, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert(ret.status_code == 200)
 
@@ -153,15 +149,14 @@ class TestClass:
                     "alertId": "Asset_RT_RTTFT_VR8600E_0724366--param_sealvoltage--Voltagetoohigh--1--p54284",
                     "lineId": "1"}
             ]}
-        logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
-        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=False)
-        logging.info("test SubscriptionInfo with fake, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert (ret.status_code == 500)
 
-    def test_UnsubscribeFromAlertByUserIdAssetId(self, configurationfile,configurationpath):
-        testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
+    @log_testcase
+    def test_UnsubscribeFromAlertByUserIdAssetId(self, testServer):
         url = testServer.get_thing_service('Alert_Management_Util','UnsubscribeFromAlertByUserIdAssetId')
 
         jsonbody={
@@ -171,10 +166,9 @@ class TestClass:
                     "alertId": "Asset_RT_RTTFT_VR8600E_0724366--param_sealvoltage--Voltagetoohigh",
                     "assetId": "Asset_RT_RTTFT_VR8600E_0724366"}
             ]}
-        logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
-        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=False)
-        logging.info("test UnsubscriptionInfo with p54284, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert(ret.status_code == 200)
 
@@ -185,15 +179,14 @@ class TestClass:
                     "alertId": "Asset_RT_RTTFT_VR8600E_0724366--param_sealvoltage--Voltagetoohigh",
                     "assetId": "Asset_RT_RTTFT_VR8600E_0724366"}
             ]}
-        logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
-        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=False)
-        logging.info("test UnsubscriptionInfo with fake, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert (ret.status_code == 500)
 
-    def test_UnsubscribeFromAlertByUserIdLineId(self, configurationfile,configurationpath):
-        testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
+    @log_testcase
+    def test_UnsubscribeFromAlertByUserIdLineId(self, testServer):
         url = testServer.get_thing_service('Alert_Management_Util','UnsubscribeFromAlertByUserIdLineId')
 
         jsonbody={
@@ -203,10 +196,9 @@ class TestClass:
                     "alertId": "Asset_RT_RTTFT_VR8600E_0724366--param_sealvoltage--Voltagetoohigh--1--p54284",
                     "lineId": "1"}
             ]}
-        logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
-        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=False)
-        logging.info("test UnsubscriptionInfo with p54284, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(),json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert(ret.status_code == 200)
 
@@ -217,9 +209,8 @@ class TestClass:
                     "alertId": "Asset_RT_RTTFT_VR8600E_0724366--param_sealvoltage--Voltagetoohigh--1--p54284",
                     "lineId": "1"}
             ]}
-        logging.info("converted JSON:{}".format(json.dumps(jsonbody, indent=2)))
-        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=False)
-        logging.info("test UnsubscriptionInfo with fake, status_code:{}, text:{}".format(ret.status_code,
-                                                                                  ret.text))
+        log_input(jsonbody)
+        ret = requests.request('POST', url, headers=testServer.get_headers(), json=jsonbody, verify=testServer.validateSSL)
+        log_ret(ret)
 
         assert (ret.status_code == 500)

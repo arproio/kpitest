@@ -9,12 +9,14 @@ import json
 from kpitest.thingworx import ThingworxServer
 
 import logging
+from .conftest import log_testcase
 
 @pytest.mark.incremental
 class TestClass:
     def get_configuration_file(self):
         return "config/gateway.json"
 
+    @log_testcase
     def test_existance_configurationfile(self,configurationfile,configurationpath,loadfilespath,loadfiles):
         logging.info("loadfiles:{}".format(loadfiles))
         logging.info("loadfiles path:{}".format(loadfilespath))
@@ -25,8 +27,7 @@ class TestClass:
         if loadfiles:
             assert(os.path.exists(loadfilespath))
 
-    def test_server(self,configurationfile,configurationpath,loadfilespath,loadfiles):
-        testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
+    def test_server(self,testServer):
         assert(testServer)
         assert(testServer.configuration['server'])
         assert(testServer.configuration['port'])
@@ -38,8 +39,7 @@ class TestClass:
         assert (testServer.configuration['port'])
         assert (testServer.configuration['protocol'])
 
-    def test_server_headers(self, configurationfile,configurationpath,loadfilespath,loadfiles):
-        testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
+    def test_server_headers(self,testServer):
         assert (testServer)
         headers = testServer.get_headers()
         assert(headers['cache-control']=='no-cache')
@@ -60,8 +60,7 @@ class TestClass:
                                                                         serviceName)
             assert(testServer.get_thing_service(thingName,serviceName) == fakeurl)
 
-    def test_get_things(self, configurationfile,configurationpath,loadfilespath,loadfiles):
-        testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
+    def test_get_things(self, testServer):
         ret = testServer.get_things()
         assert(ret.status_code==200)
 

@@ -6,6 +6,7 @@ class ThingworxServer():
     '''class to handle a general thingworx server and generate regular URL'''
     def __init__(self, configuration):
         self.configuration = configuration
+        self.validateSSL=True
     
     @classmethod
     def fromConfigurationFile(cls, configurationfile):
@@ -42,6 +43,7 @@ class ThingworxServer():
         configuration['protocol'] = protocol
 
         return cls(configuration)
+
 
     def get_headers(self):
         return {
@@ -80,7 +82,7 @@ class ThingworxServer():
 
         headers = self.get_headers()
 
-        ret = requests.request("GET", url, headers=headers, verify=False)
+        ret = requests.request("GET", url, headers=headers, verify=self.validateSSL)
         return ret
 
     def get_import_url(self):
