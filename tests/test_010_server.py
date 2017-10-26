@@ -10,13 +10,17 @@ from kpitest.thingworx import ThingworxServer
 
 import logging
 from .conftest import log_testcase
+import allure
 
+@pytest.mark.order1
 @pytest.mark.incremental
+@allure.feature("Server Management")
 class TestClass:
     def get_configuration_file(self):
         return "config/gateway.json"
 
     @log_testcase
+    @allure.step(title="check configuration file")
     def test_existance_configurationfile(self,configurationfile,configurationpath,loadfilespath,loadfiles):
         logging.info("loadfiles:{}".format(loadfiles))
         logging.info("loadfiles path:{}".format(loadfilespath))
@@ -27,6 +31,7 @@ class TestClass:
         if loadfiles:
             assert(os.path.exists(loadfilespath))
 
+    @allure.step(title="check server url components")
     def test_server(self,testServer):
         assert(testServer)
         assert(testServer.configuration['server'])
@@ -39,6 +44,7 @@ class TestClass:
         assert (testServer.configuration['port'])
         assert (testServer.configuration['protocol'])
 
+    @allure.step(title="check default headers components")
     def test_server_headers(self,testServer):
         assert (testServer)
         headers = testServer.get_headers()
@@ -46,6 +52,7 @@ class TestClass:
         assert(headers['Content-Type']=='application/json')
         assert(headers['Accept']=='application/json')
 
+    @allure.step(title="check server url completeness")
     def test_service_url(self, configurationfile,configurationpath,loadfilespath,loadfiles):
         testServer = ThingworxServer.fromConfigurationFile(os.path.join(configurationpath, configurationfile))
         assert (testServer)
@@ -60,6 +67,8 @@ class TestClass:
                                                                         serviceName)
             assert(testServer.get_thing_service(thingName,serviceName) == fakeurl)
 
+    @log_testcase
+    @allure.step(title="try to get all things as list from server")
     def test_get_things(self, testServer):
         ret = testServer.get_things()
         assert(ret.status_code==200)
@@ -67,3 +76,21 @@ class TestClass:
         data = json.loads(ret.text)
         assert(len(data['rows'])>300)
         assert(data['dataShape'])
+
+    @log_testcase
+    @allure.step(title="try to load all files required")
+    def test_import_files(self, testServer,loadfilespath,loadfiles):
+        if not loadfiles:
+            logging.info("Bypass file loading......")
+            return    # don't load files
+
+        for file in os.listdir(loadfilespath):
+            filename = os.fsdecode(file)
+            logging.info("checking file name:{}".format(filename))
+            if filename.endswith(".xml") or filename.endswith(".twx"):
+                logging.info("Importing:{}".format(filename))
+
+                ret = testServer.import_file(os.path.join(loadfilespath,filename))
+                logging.info(ret)
+                assert(ret.status_code == 200)
+                assert(ret.text == "success")

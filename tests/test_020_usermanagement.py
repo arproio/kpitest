@@ -4,27 +4,15 @@ import pytest
 import os
 import json
 import logging
+import allure
 
 from kpitest.thingworx import  ThingworxServer
 from .conftest import log_testcase,log_input,log_ret
 
+@pytest.mark.order2
 #@pytest.mark.incremental
+@allure.feature("User Management")
 class TestClass:
-    @log_testcase
-    def test_import_user_management_service(self, testServer,loadfilespath,loadfiles):
-        if not loadfiles:
-            logging.info("Bypass file loading......")
-            return    # don't load files
-
-        for file in os.listdir(loadfilespath):
-            filename = os.fsdecode(file)
-            logging.info("checking file name:{}".format(filename))
-            if filename.endswith(".xml") or filename.endswith(".twx"):
-                logging.info("start to import:{}".format(filename))
-
-                ret = testServer.import_file(os.path.join(loadfilespath,filename))
-                assert(ret.status_code == 200)
-                assert(ret.text == "success")
 
     @log_testcase
     def test_user_management_service_check(self, testServer):

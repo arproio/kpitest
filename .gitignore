@@ -3,10 +3,11 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+report/
 # C extensions
 *.so
 test.log
-
+tests/logs/
 # Distribution / packaging
 .Python
 .idea/
