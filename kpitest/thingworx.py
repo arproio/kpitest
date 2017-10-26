@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import logging
 
 class ThingworxServer():
     '''class to handle a general thingworx server and generate regular URL'''
@@ -92,6 +93,7 @@ class ThingworxServer():
             self.configuration['port']
         )
 
+
     def get_import_headers(self):
         return {
             'appKey':self.configuration['appKey'],
@@ -99,6 +101,25 @@ class ThingworxServer():
             'x-xsrf-token': "TWX-XSRF-TOKEN-VALUE",
             'cache-control':'no-cache'
             }
+
+
+    def delete_entity(self,action,entityName):
+        url='{}://{}:{}/Thingworx/Resources/EntityServices/{}'.format(
+            self.configuration['protocol'],
+            self.configuration['server'],
+            self.configuration['port'],
+            action
+        )
+        jsonbody={
+            "name":entityName
+        }
+
+        logging.info("URL:{}".format(url))
+        logging.info("Input:{}".format(jsonbody))
+        ret = requests.request("POST",url,json=jsonbody, headers=self.get_headers())
+        #logging.info("Response:{}".format(ret.text))
+
+        return ret
 
     def import_file(self,inputfilename):
         url = self.get_import_url()
@@ -129,12 +150,9 @@ if __name__ == '__main__':
     dir_path = os.path.dirname(os.path.realpath(__file__))
     print("dir path:{}".format(dir_path))
 
-    testServer = ThingworxServer.fromConfigurationFile(os.path.join(dir_path,
-                                                                    "../config/gateway.json"))
-
-    ret = testServer.get_things()
-    if ret.status_code == 200 and ret.text:
-        data = json.loads(ret.text)
-        print("JSON:{}".format(data['rows'][0]))
-
-    #print(ret.text)
+    import csv
+    dict1={}
+    with open(os.path.join(dir_path,"../tests/loadfiles/load_files_list.csv"),"r") as infile:
+        reader=csv.DictReader(infile)
+        for row in reader:
+            print("{},{},{}".format(row['Action'],row['Entity'],row['Comment']))

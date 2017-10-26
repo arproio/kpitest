@@ -1,0 +1,14 @@
+Action,Entity,Comment
+Import,ThingShapes_UserExtensions.xml,Added Client ID
+Import,Things_User_Management_Util.xml,
+Import,Things_Alert_Management_Util.xml,
+Import,Things_postGres_VPP_1hourTimer.xml,
+Import,Things_postGres_VPP_1minTimer.xml,
+Import,Things_postGres_VPP_1secTimer.xml,
+Import,Things_postGres_VPP_10secTime.xml,
+Import,ThingShapes_TS_VPP3002_CogniPro_Alarms_V3.xml,
+Import,ThingShapes_TS_VPP3002_CogniPro_KPIs.xml,
+Import,ThingShapes_TS_VPP3002_CogniPro_Precision.xml,
+Import,ThingShapes_TS_VPP3002_CogniPro.xml,
+Import,ThingTemplates_RemoteDatabase.xml,
+Import,ThingTemplates_TT_RDB_VPP3002.xml,

@@ -5,6 +5,7 @@ import requests
 import sys
 import os
 import json
+import csv
 
 from kpitest.thingworx import ThingworxServer
 
@@ -84,13 +85,21 @@ class TestClass:
             logging.info("Bypass file loading......")
             return    # don't load files
 
-        for file in os.listdir(loadfilespath):
-            filename = os.fsdecode(file)
-            logging.info("checking file name:{}".format(filename))
-            if filename.endswith(".xml") or filename.endswith(".twx"):
-                logging.info("Importing:{}".format(filename))
+        assert(os.path.exists(loadfilespath))
+        loadfileslist=os.path.join(loadfilespath,"load_files_list.csv")
+        assert(os.path.exists(loadfileslist))
 
-                ret = testServer.import_file(os.path.join(loadfilespath,filename))
-                logging.info(ret)
+        with open(loadfileslist, "r") as infile:
+            reader = csv.DictReader(infile)
+            for row in reader:
+                #ensure header is bypast
+                logging.info("Processing: {},{},{}".format(row['Action'], row['Entity'], row['Comment']))
+                ret = None
+                if row['Action'].startswith('Delete'):
+                    ret = testServer.delete_entity(row['Action'],row['Entity'])
+
+                if row['Action']=='Import':
+                    ret = testServer.import_file(os.path.join(loadfilespath,row['Entity']))
+
+                logging.info("Response:{}".format(ret))
                 assert(ret.status_code == 200)
-                assert(ret.text == "success")
