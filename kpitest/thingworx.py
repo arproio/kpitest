@@ -8,6 +8,10 @@ class ThingworxServer():
     def __init__(self, configuration):
         self.configuration = configuration
         self.validateSSL=True
+        self.templates = []
+        self.things = []
+        self.simulatorConfigurationFile=None
+        self.otherConfigs = {}
     
     @classmethod
     def fromConfigurationFile(cls, configurationfile):
@@ -23,15 +27,42 @@ class ThingworxServer():
             'appKey':None,
             'protocol':'https'
         }
+        configMapping={
+            'server':'ServerLocation',
+            'port':'Port',
+            'appKey':'AppKey',
+            'protocol':'Security'
+        }
         with open(configurationfile,'r') as data_file:
             configuration = json.load(data_file)
             new_configuration = {}
+
             for configitem in ['server','port','appKey','protocol']:
-                itemvalue=configuration.get(configitem,default_config[configitem])
+                itemvalue=configuration.get(configitem,
+                                            configuration.get(configMapping[configitem],
+                                            default_config[configitem]))
                 if not itemvalue:
                     raise ValueError('{} is not provided in configuration file!'.format(configitem))
                 new_configuration[configitem]=itemvalue
-            return cls(new_configuration)
+
+            if new_configuration['protocol'] == True:
+                new_configuration['protocol'] = 'https'
+
+            if new_configuration['protocol'] == False:
+                new_configuration['protocol'] = 'http'
+
+
+            otherConfigs = {}
+            for key, value in configuration.items():
+                if key not in ['server','port','appKey','protocol']:
+                    otherConfigs[key]= value
+
+            #print("Server Configuration:{}".format(new_configuration))
+
+            newInstance =  cls(new_configuration)
+            newInstance.otherConfigs = otherConfigs
+
+            return newInstance
 
         raise ValueError('Failed to initialize server from:{}'.format(configurationfile))
 
@@ -45,6 +76,16 @@ class ThingworxServer():
 
         return cls(configuration)
 
+    def get_thing_service_url(self,thingName, serviceName):
+        return '{}://{}:{}/Thingworx/Things/{}/Services/{}'.format(
+                self.configuration['protocol'],
+                self.configuration['server'],
+                self.configuration['port'],
+                thingName,
+                serviceName
+            )
+
+
 
     def get_headers(self):
         return {
@@ -55,14 +96,34 @@ class ThingworxServer():
             }
     
     def get_thing_service(self, thingName,serviceName):
-        return '{}://{}:{}/Thingworx/Things/{}/services/{}'.format(
+        url= '{}://{}:{}/Thingworx/Things/{}/services/{}'.format(
                 self.configuration['protocol'],
                 self.configuration['server'],
                 self.configuration['port'],
                 thingName,
                 serviceName
             )
+        logging.info("url:{}".format(url))
+        return url
     
+
+    def get_create_thing_url(self):
+        return '{}://{}:{}/Thingworx/Resources/EntityServices/Services/CreateThing'.format(
+            self.configuration['protocol'],
+            self.configuration['server'],
+            self.configuration['port']
+        )
+
+    def get_thingtemplate_dependency_url(self,templateName):
+        url= '{}://{}:{}/Thingworx/ThingTemplates/{}/Services/GetOutgoingDependencies'.format(
+            self.configuration['protocol'],
+            self.configuration['server'],
+            self.configuration['port'],
+            templateName
+        )
+
+        logging.info("get_thingtemplate_dependency_url:{}".format(url))
+        return url
 
     def get_delete_thing_url(self):
         return '{}://{}:{}/Thingworx/Resources/EntityServices/Services/DeleteThing'.format(
@@ -72,19 +133,90 @@ class ThingworxServer():
         )
 
     def get_things_url(self):
-        return '{}://{}:{}/Thingworx/Things'.format(
+        url= '{}://{}:{}/Thingworx/Things'.format(
             self.configuration['protocol'],
             self.configuration['server'],
             self.configuration['port']
         )
 
+        logging.info("url:{}".format(url))
+        return url
+
+    def get_thing_template_valuestream(self,templateName):
+        pass
+
+    def get_thing_templates(self):
+        url = '{}://{}:{}/Thingworx/ThingTemplates'.format(
+            self.configuration['protocol'],
+            self.configuration['server'],
+            self.configuration['port']
+        )
+
+        ret = requests.request("GET",url, headers = self.get_headers(),verify=self.validateSSL)
+        return ret
+
+    def get_thing_property_update_url(self,thingName, propertyName):
+        url = '{}://{}:{}/Thingworx/Things/{}/Properties/{}'.format(
+            self.configuration['protocol'],
+            self.configuration['server'],
+            self.configuration['port'],
+            thingName,
+            propertyName
+        )
+        return url
+
+    def get_twx_download_url(self,twxType, twxName):
+        url = '{}://{}:{}/Thingworx/Exporter/{}s/{}'.format(
+            self.configuration['protocol'],
+            self.configuration['server'],
+            self.configuration['port'],
+            twxType,
+            twxName
+        )
+
+        logging.info("get_twx_download_url:{}".format(url))
+
+        return url
+
     def get_things(self):
         url = self.get_things_url()
+        logging.info("url:{}".format(url))
 
         headers = self.get_headers()
 
         ret = requests.request("GET", url, headers=headers, verify=self.validateSSL)
         return ret
+
+    def check_template(self,templateName):
+        if len(self.templates) == 0:
+            #first time.
+            ret = self.get_thing_templates()
+            if ret.status_code == 200:
+                data = json.loads(ret.text)
+                for index in range(len(data['rows'])):
+                    self.templates.append(data['rows'][index]['name'])
+        logging.info("Templates on Server:{}".format(self.templates))
+
+        if templateName in self.templates:
+            return True
+        else:
+            return False
+
+    def check_thing(self,thingName):
+        if len(self.things) == 0:
+            ret = self.get_things()
+            if ret.status_code == 200:
+                data = json.loads(ret.text)
+                for index in range(len(data['rows'])):
+                    self.things.append(data['rows'][index]['name'])
+
+        logging.info('Things on Server:{}'.format(self.things))
+
+        if thingName in self.things:
+            return True
+        else:
+            return False
+
 
     def get_import_url(self):
         return '{}://{}:{}/Thingworx/Importer'.format(

@@ -1,0 +1,11 @@
+Action,Entity,Comment
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/postGres_8600E_1hrTimer.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/postGres_8600E_1minTimer_V1.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/IndustrialThingShape.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_8600_E_Cognipro_Alarms.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_8600_E_Cognipro_KPI.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_VR8600E_Cognipro_Parameters.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_8600_E_CogniPro_Messages.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/RemoteThingWithTunnelsAndFileTransfer.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/VS_VR8600-E.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TT_VS_RTTFT_VR8600E_V_0_0_1.xml,

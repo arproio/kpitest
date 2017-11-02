@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Entities build="b46" majorVersion="8" minorVersion="0" modelPersistenceProviderPackage="PostgresPersistenceProviderPackage" revision="4" schemaVersion="1000"><ThingTemplates><ThingTemplate baseThingTemplate="RemoteThing" description="Thing Template for VPP3002" documentationContent="&lt;p&gt;10/25/17 - JEN - remove TS_VPP3002_CogniPro_KPIs (made a copy called TS_VPP3002_CogniPro_KPIs_OLD_V1) &amp; replace with new version that includes alarm time and state time sum KPIs.&lt;br&gt;&lt;/p&gt;&#10;&#10;&lt;p&gt;10/24 - REPLACE TS_VPP3002_CogniPro_Alarms_v2 with TS_VPP3002_CogniPro_Alarms_V3, to remove &quot;ALARM *&quot; from the beginning of the friendly name, by Glen's request. (JEN)&lt;/p&gt;&#10;&#10;&#10;&#10;&lt;p&gt;10/20 - JEN removed subscription related to property param_DailyPackCounter, since only param_dailypackcounter (all lower case) will allow DEV with TT_RDB_VPP3002 to work.  I've saved a copy of this TT in CogniPro_VPP_DEV_1020.2.xml in Gitlab, though, in case we need to restore it later.&lt;br&gt;&lt;/p&gt;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&#10;&lt;p&gt;10/19 - JEN replacing old Alarm TS with updated one (using alarm#s instead of alarm descriptions in the property name).  Removing what's now called TS_VPP3002_CogniPro_Alarms_OLD_V1.&lt;/p&gt;" effectiveThingPackage="RemoteThing" homeMashup="" lastModifiedDate="2017-10-27T16:44:15.950Z" name="TT_VPP3002" projectName="CogniPro" tags="" thingPackage="" valueStream="VS_VPP3002"><Owner name="Jennifer" type="User"/><avatar/><DesignTimePermissions><Create/><Read/><Update/><Delete/><Metadata/></DesignTimePermissions><RunTimePermissions/><VisibilityPermissions><Visibility/></VisibilityPermissions><ConfigurationTables/><PropertyBindings/><RemotePropertyBindings/><RemoteServiceBindings/><RemoteEventBindings/><AlertConfigurations/><ThingShape><PropertyDefinitions/><ServiceDefinitions><ServiceDefinition aspect.isAsync="false" category="" description="Update Remote KPI Properties for the specific PLC Time stamp row in Value steam" isAllowOverride="false" isLocalOnly="false" isOpen="false" isPrivate="false" name="updateRemoteKPIProperties"><ResultType baseType="NOTHING" description="" name="result" ordinal="0"/><ParameterDefinitions><FieldDefinition aspect.dataShape="DS_VPP3002_CogniPro_KPIs" baseType="INFOTABLE" description="" name="KPIParameters" ordinal="2"/><FieldDefinition baseType="DATETIME" description="" name="PLCTimeStamp" ordinal="1"/></ParameterDefinitions></ServiceDefinition></ServiceDefinitions><EventDefinitions/><ServiceMappings/><ServiceImplementations><ServiceImplementation description="" handlerName="Script" name="updateRemoteKPIProperties"><ConfigurationTables><ConfigurationTable description="Script" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT_VPP3002 updateRemoteKPIProperties - START");
+logger.debug("TT_VPP3002 updateRemoteKPIProperties - Remote Thing name: "+me.name);
+var paramTable= Resources["InfoTableFunctions"].CreateInfoTable();
+var field = new Object();
+field.name = "name";
+field.baseType = "STRING";
+paramTable.AddField(field);
+field.name="baseType";
+paramTable.AddField(field);
+
+var row = new Object();
+row.name = "timestamp"
+row.baseType = "DATETIME";
+paramTable.AddRow(row);
+
+var query=
+    {
+        "filters": {
+            "type": "EQ",
+            "fieldName": "PLC_TimeStamp",
+            "value":PLCTimeStamp
+        }
+    };
+
+var params = {
+    oldestFirst: undefined /* BOOLEAN */,
+    maxItems: undefined /* NUMBER */,
+    endDate: undefined /* DATETIME */,
+    propertyNames: paramTable /* INFOTABLE */,
+    query: query /* QUERY */,
+    startDate: undefined /* DATETIME */
+};
+
+
+var tmpResult = me.QueryNamedPropertyHistory(params);
+if(tmpResult!=null){
+    var timeStamp = tmpResult[0].timestamp;
+    var updateInfoTable = Resources["InfoTableFunctions"].CreateInfoTable();
+    var nameField = new Object();
+    nameField.name = "name";
+    nameField.baseType = 'STRING';
+    updateInfoTable.AddField(nameField);
+
+    var valueField = new Object();
+    valueField.name = "value";
+    valueField.baseType = 'STRING';
+    updateInfoTable.AddField(valueField);
+
+    var timeStampField = new Object();
+    timeStampField.name = "time";
+    timeStampField.baseType = 'DATETIME';
+    updateInfoTable.AddField(timeStampField);
+
+    for (var entry in KPIParameters.rows){
+        var updateRow = new Object();
+        updateRow.name = KPIParameters[entry].name;
+        updateRow.value =  KPIParameters[entry].value;
+        updateRow.time=timeStamp;
+        updateInfoTable.AddRow(updateRow);
+        var params = {
+        values: updateInfoTable /* INFOTABLE */  
+    	};
+    me.UpdatePropertyValues(params);
+    }
+}
+logger.debug("TT_VPP3002 updateRemoteKPIProperties - END");]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></ServiceImplementations><Subscriptions/></ThingShape><ImplementedShapes><ImplementedShape name="TS_VPP3002_CogniPro_KPIs" type="ThingShape"/><ImplementedShape name="TS_VPP3002_CogniPro_Precision" type="ThingShape"/><ImplementedShape name="TS_VPP3002_CogniPro" type="ThingShape"/><ImplementedShape name="TS_VPP3002_CogniPro_Alarms_v1" type="ThingShape"/></ImplementedShapes><SharedConfigurationTables/><InstanceDesignTimePermissions><Create/><Read/><Update/><Delete/><Metadata/></InstanceDesignTimePermissions><InstanceRunTimePermissions/><InstanceVisibilityPermissions><Visibility/></InstanceVisibilityPermissions><ConfigurationChanges><ConfigurationChange changeAction="CREATE" changeReason="header : name : updated, baseThingTemplate : updated, implementedShapes : updated, description : updated, projectName : updated&#10;documentation : updated&#10;" timestamp="2017-04-06T20:53:41.492Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="header : implementedShapes : updated&#10;documentation : updated&#10;" timestamp="2017-04-07T13:13:27.677Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="header : implementedShapes : updated&#10;" timestamp="2017-04-07T15:09:29.150Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="header : implementedShapes : updated&#10;" timestamp="2017-04-07T15:10:43.540Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="header : valueStream : updated&#10;" timestamp="2017-04-07T16:22:30.699Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="subscriptions : param_DailyPackCounter.DataChange : New subscription, Subscription Added, New subscription : Code Updated&#10;" timestamp="2017-04-07T17:16:11.638Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="services : updateRemoteKPIProperties : Description updated, Service Added&#10;subscriptions : New subscription : Disabled&#10;" timestamp="2017-04-07T17:17:10.888Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="services : updateRemoteKPIProperties : Code Updated&#10;" timestamp="2017-04-07T17:20:48.560Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="services : updateRemoteKPIProperties : Code Updated, Input parameter PLCTimeStamp Added, Inputs updated, Input parameter KPIParameters Added&#10;" timestamp="2017-04-07T17:47:18.139Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="" timestamp="2017-04-07T17:50:37.530Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="" timestamp="2017-04-07T17:52:17.686Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="" timestamp="2017-04-07T18:08:53.264Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="" timestamp="2017-04-07T18:09:14.108Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="" timestamp="2017-04-07T18:23:54.656Z" user="Satish"/><ConfigurationChange changeAction="MODIFY" changeReason="header : projectName : updated&#10;" timestamp="2017-04-13T13:29:10.857Z" user="Satish"/><ConfigurationChange changeAction="FORCEEDIT" changeReason="" timestamp="2017-04-24T14:04:50.189Z" user="Rajesh"/><ConfigurationChange changeAction="MODIFY" changeReason="" timestamp="2017-04-24T14:44:49.409Z" user="Rajesh"/><ConfigurationChange changeAction="CREATE" changeReason="" timestamp="2017-07-26T00:23:50.084Z" user="Administrator"/><ConfigurationChange changeAction="MODIFY" changeReason="" timestamp="2017-07-26T01:03:03.072Z" user="Administrator"/><ConfigurationChange changeAction="MODIFY" changeReason="header : documentationContent : updated, implementedShapes : updated&#10;" timestamp="2017-10-19T21:46:24.084Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="header : documentationContent : updated&#10;" timestamp="2017-10-19T21:46:29.272Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="header : documentationContent : updated&#10;" timestamp="2017-10-19T21:48:51.946Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="header : documentationContent : updated&#10;" timestamp="2017-10-20T20:19:48.037Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="" timestamp="2017-10-20T20:20:04.166Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="subscriptions : Event.DataChange:Property.param_DailyPackCounter : removed&#10;" timestamp="2017-10-20T20:20:30.252Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="header : documentationContent : updated&#10;" timestamp="2017-10-20T20:37:03.064Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="" timestamp="2017-10-20T20:37:04.680Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="header : implementedShapes : updated&#10;" timestamp="2017-10-23T17:54:43.060Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="header : implementedShapes : updated&#10;" timestamp="2017-10-24T19:40:20.422Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="header : documentationContent : updated&#10;" timestamp="2017-10-24T19:42:41.980Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="" timestamp="2017-10-24T19:43:37.267Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="header : implementedShapes : updated, documentationContent : updated&#10;" timestamp="2017-10-25T21:28:48.238Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="header : documentationContent : updated, implementedShapes : updated&#10;" timestamp="2017-10-25T21:38:13.625Z" user="Jennifer"/><ConfigurationChange changeAction="MODIFY" changeReason="header : implementedShapes : updated&#10;documentation : updated&#10;" timestamp="2017-10-27T16:44:15.950Z" user="Jennifer"/></ConfigurationChanges></ThingTemplate></ThingTemplates></Entities>

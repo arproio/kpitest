@@ -2,6 +2,59 @@
 import requests
 import json
 from datetime import datetime
+import logging
+import os
+import datetime
+import argparse
+
+def setup_log():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    logpath = os.path.join(dir_path, "..","logs")
+    if not os.path.exists(logpath):
+        os.makedirs(logpath, 0o777, True)
+    filename = "kpitest{}.log".format(datetime.datetime.now().strftime('%Y%m%d%H%M%s'))
+
+    logging.basicConfig(filename=os.path.join(logpath, filename), level=logging.INFO)
+
+def parse_commandline():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("--config", action="store", default="gateway.json", help="configuration file of server setting")
+
+    dir_path = os.path.dirname(os.path.realpath(__file__))  # get current dir
+    default_configuration_file_path = os.path.join(dir_path, "../config")
+    parser.add_argument("--config_path", action="store", default=default_configuration_file_path,
+                     help="configuration file folder")
+
+    default_loadfiles_folder = os.path.join(dir_path, "./loadfiles")
+    parser.add_argument("--loadfiles_path", action="store", default=default_loadfiles_folder,
+                     help="loadfiles folder")
+
+    parser.add_argument("--loadfiles", action="store_true", default=False,
+                     help="whether load files or not.")
+
+    parser.add_argument("--sslvalidation", action="store_true", default=False,
+                     help="whether validate SSL from server side")
+
+    default_export_folder = os.path.join(dir_path,"../loadfiles")
+
+    parser.add_argument("--export_path",action="store", default=default_export_folder,
+                        help="folder to store exported files, usually it will be load folder.")
+
+    parser.add_argument("--export_config",action="store",default="",
+                        help="default is 'exported_' + config file, and it will be used for import later.")
+
+    parsed_args=parser.parse_args()
+
+    if not os.path.exists(parsed_args.export_path):
+        os.makedirs(parsed_args.export_path,0o777,True)
+
+    if parsed_args.export_config == "":
+        parsed_args.export_config = "export_" + parsed_args.config +".csv"
+
+
+    return parsed_args
+
 
 def get_application_key():
     return '84ce8ad3-e081-4d01-9af0-f6fef4156362'

@@ -79,6 +79,17 @@ class TestClass:
         assert(data['dataShape'])
 
     @log_testcase
+    @allure.step(title="check template exists or not")
+    def test_check_template(self,testServer):
+        assert(testServer.check_template('GenericThing'))
+
+    @log_testcase
+    @allure.step(title="check thing exists or not")
+    def test_check_thing(self, testServer):
+        assert (testServer.check_thing('AlertHistoryStream'))
+
+
+    @log_testcase
     @allure.step(title="try to load all files required")
     def test_import_files(self, testServer,loadfilespath,loadfiles):
         if not loadfiles:

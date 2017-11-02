@@ -1,0 +1,13 @@
+Action,Entity,Comment
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/DataShapes_DS_VS95TS_leakholdactive.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/DataShapes_DS_VS95TS_param_bpreemptivedataavailable.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/DataShapes_DS_VS95TS_param_productloaddone.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/DataShapes_DS_VS95TS_param_vaccomplete.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/postGres_VS95TS_1hrTimer.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/postGres_VS95TS_1minTimer.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_VS95TS_Cognipro_Alarms.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_VS95TS_Cognipro_Parameters.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_VS95TS_Cognipro_KPI.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/RemoteThingWithTunnelsAndFileTransfer.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/VS_VS95TS.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TT_VS_RTTFT_VS95TS_V_0_0_1.xml,

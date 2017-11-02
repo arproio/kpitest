@@ -1,0 +1,10 @@
+Action,Entity,Comment
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/postGres_1X_1minTimer.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/postGres_1X_1hrTimer.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_8600-1X_CogniPro_Alarms.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/IndustrialThingShape.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_8600-1X_CogniPro_Parameters.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_8600-1X_CogniPro_KPI.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/RemoteThingWithTunnelsAndFileTransfer.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/VS_VR8600-1X.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TT_VS_RTTFT_VR86001X.xml,

@@ -1,0 +1,9 @@
+Action,Entity,Comment
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_VPP3002_CogniPro_KPIs.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_VPP3002_CogniPro_Precision.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_VPP3002_CogniPro.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TS_VPP3002_CogniPro_Alarms_v1.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/DS_VPP3002_CogniPro_KPIs.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/RemoteThing.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/VS_VPP3002.xml,
+Import,/Users/desheng/builds/kpitest/kpitest/../loadfiles/TT_VPP3002.xml,

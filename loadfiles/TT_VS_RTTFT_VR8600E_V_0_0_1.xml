@@ -1,0 +1,518 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><Entities build="b46" majorVersion="8" minorVersion="0" modelPersistenceProviderPackage="PostgresPersistenceProviderPackage" revision="4" schemaVersion="1000"><ThingTemplates><ThingTemplate baseThingTemplate="RemoteThingWithTunnelsAndFileTransfer" description="New Thing Template for KPI's using Value Stream  " documentationContent="" effectiveThingPackage="RemoteThingWithTunnelsAndFileTransfer" homeMashup="" lastModifiedDate="2017-10-27T19:58:18.000Z" name="TT_VS_RTTFT_VR8600E_V_0_0_1" projectName="CogniPro" tags="SEE:08292017;cogniProTag:DeshengSimExport" thingPackage="" valueStream="VS_VR8600-E"><Owner name="Jennifer" type="User"/><avatar/><DesignTimePermissions><Create/><Read/><Update/><Delete/><Metadata/></DesignTimePermissions><RunTimePermissions/><VisibilityPermissions><Visibility/></VisibilityPermissions><ConfigurationTables><ConfigurationTable description="Tunneling Destinations" isMultiRow="true" name="Tunnels" ordinal="1"><DataShape><FieldDefinitions><FieldDefinition aspect.defaultValue="" aspect.friendlyName="Application Path" baseType="STRING" description="Location of the client app that will use this tunnel" name="appUri" ordinal="5"/><FieldDefinition aspect.defaultValue="" aspect.friendlyName="Description" baseType="STRING" description="A description of the tunnel" name="description" ordinal="3"/><FieldDefinition aspect.defaultValue="127.0.0.1" aspect.friendlyName="Host" baseType="STRING" description="Host or IP that this tunnel will connect to at the edge" name="host" ordinal="1"/><FieldDefinition aspect.defaultValue="vnc" aspect.friendlyName="Name" baseType="STRING" description="Name of the tunnel" name="name" ordinal="0"/><FieldDefinition aspect.defaultValue="1.0" aspect.friendlyName="Number of Connects" baseType="NUMBER" description="The number of connections required to establish this tunnel" name="numConnects" ordinal="4"/><FieldDefinition aspect.defaultValue="5900.0" aspect.friendlyName="Port" baseType="NUMBER" description="Port that this tunnel will connect to at the edge" name="port" ordinal="2"/><FieldDefinition aspect.defaultValue="tcp" aspect.friendlyName="Protocol" baseType="STRING" description="The protocol used over this tunnel" name="proto" ordinal="6"/></FieldDefinitions></DataShape><Rows/></ConfigurationTable><ConfigurationTable description="General Settings" isMultiRow="false" name="TunnelSettings" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition aspect.friendlyName="Enable Tunneling" aspect.isNullable="true" baseType="BOOLEAN" description="Enable tunneling" name="enableTunneling" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row/></Rows></ConfigurationTable></ConfigurationTables><PropertyBindings/><RemotePropertyBindings/><RemoteServiceBindings/><RemoteEventBindings/><AlertConfigurations><AlertDefinitions name="dataMismatchCount"/><AlertDefinitions name="plcTimeStamp"/><AlertDefinitions name="postgresSensorDaTable"/><AlertDefinitions name="shiftNumber"/><AlertDefinitions name="shiftStrtTime"/></AlertConfigurations><ThingShape><PropertyDefinitions><PropertyDefinition aspect.cacheTime="0.0" aspect.dataChangeThreshold="0.0" aspect.dataChangeType="VALUE" aspect.isLogged="false" aspect.isPersistent="true" aspect.isReadOnly="false" baseType="INTEGER" category="" description="" isLocalOnly="false" name="dataMismatchCount" ordinal="6"/><PropertyDefinition aspect.cacheTime="0.0" aspect.dataChangeType="VALUE" aspect.isLogged="false" aspect.isPersistent="true" aspect.isReadOnly="false" baseType="STRING" category="" description="" isLocalOnly="false" name="plcTimeStamp" ordinal="4"/><PropertyDefinition aspect.cacheTime="0.0" aspect.dataChangeType="VALUE" aspect.defaultValue=" cognipro.cognipro_vr8600_e_sensordata" aspect.isLogged="false" aspect.isPersistent="true" aspect.isReadOnly="true" baseType="STRING" category="" description="" isLocalOnly="false" name="postgresSensorDaTable" ordinal="3"/><PropertyDefinition aspect.cacheTime="0.0" aspect.dataChangeType="VALUE" aspect.isLogged="false" aspect.isPersistent="true" aspect.isReadOnly="false" baseType="STRING" category="" description="" isLocalOnly="false" name="shiftNumber" ordinal="1"/><PropertyDefinition aspect.cacheTime="0.0" aspect.dataChangeType="VALUE" aspect.isLogged="false" aspect.isPersistent="true" aspect.isReadOnly="false" baseType="STRING" category="" description="" isLocalOnly="false" name="shiftStrtTime" ordinal="4"/></PropertyDefinitions><ServiceDefinitions><ServiceDefinition aspect.isAsync="false" category="" description="" isAllowOverride="false" isLocalOnly="false" isOpen="false" isPrivate="false" name="insertAlarmLogintoDB"><ResultType baseType="NOTHING" description="" name="result" ordinal="0"/><ParameterDefinitions><FieldDefinition baseType="INTEGER" description="" name="Alarm1" ordinal="3"/><FieldDefinition baseType="INTEGER" description="" name="Alarm2" ordinal="4"/><FieldDefinition baseType="INTEGER" description="" name="Alarm3" ordinal="5"/><FieldDefinition baseType="INTEGER" description="" name="Alarm4" ordinal="6"/><FieldDefinition baseType="STRING" description="" name="assetID" ordinal="1"/><FieldDefinition baseType="STRING" description="" name="plcTimeStamp" ordinal="2"/></ParameterDefinitions></ServiceDefinition><ServiceDefinition aspect.isAsync="false" category="" description="" isAllowOverride="false" isLocalOnly="false" isOpen="false" isPrivate="false" name="insertDBRecord"><ResultType baseType="NOTHING" description="" name="result" ordinal="0"/><ParameterDefinitions><FieldDefinition baseType="INTEGER" description="" name="alarm1" ordinal="11"/><FieldDefinition baseType="INTEGER" description="" name="alarm2" ordinal="12"/><FieldDefinition baseType="INTEGER" description="" name="alarm3" ordinal="13"/><FieldDefinition baseType="INTEGER" description="" name="alarm4" ordinal="14"/><FieldDefinition baseType="STRING" description="" name="machineID" ordinal="1"/><FieldDefinition baseType="INTEGER" description="" name="param_chambernumber" ordinal="4"/><FieldDefinition baseType="INTEGER" description="" name="param_lifetimecycle" ordinal="7"/><FieldDefinition baseType="INTEGER" description="" name="param_platenumber" ordinal="3"/><FieldDefinition baseType="INTEGER" description="" name="param_productcount" ordinal="8"/><FieldDefinition baseType="INTEGER" description="" name="param_productpresent" ordinal="9"/><FieldDefinition baseType="INTEGER" description="" name="param_sealcurrent" ordinal="5"/><FieldDefinition baseType="INTEGER" description="" name="param_sealvoltage" ordinal="24"/><FieldDefinition baseType="INTEGER" description="" name="param_speedcpm" ordinal="6"/><FieldDefinition baseType="INTEGER" description="" name="param_speedppm" ordinal="16"/><FieldDefinition baseType="INTEGER" description="" name="param_vac" ordinal="17"/><FieldDefinition baseType="STRING" description="" name="plcTimeStamp" ordinal="2"/><FieldDefinition baseType="INTEGER" description="" name="state_all" ordinal="10"/></ParameterDefinitions></ServiceDefinition><ServiceDefinition aspect.isAsync="false" category="" description="" isAllowOverride="false" isLocalOnly="false" isOpen="false" isPrivate="false" name="parseComplexCycleData"><ResultType baseType="INFOTABLE" description="" name="result" ordinal="0"/><ParameterDefinitions><FieldDefinition baseType="STRING" description="" name="param_complex_cycledata" ordinal="1"/></ParameterDefinitions></ServiceDefinition><ServiceDefinition aspect.isAsync="false" category="" description="" isAllowOverride="false" isLocalOnly="false" isOpen="false" isPrivate="false" name="queryNamedValueStream"><ResultType baseType="INFOTABLE" description="" name="result" ordinal="0"/><ParameterDefinitions><FieldDefinition baseType="DATETIME" description="" name="endDate" ordinal="2"/><FieldDefinition aspect.defaultValue="10" baseType="INTEGER" description="" name="maxItems" ordinal="3"/><FieldDefinition baseType="DATETIME" description="" name="startDate" ordinal="1"/></ParameterDefinitions></ServiceDefinition><ServiceDefinition aspect.isAsync="false" category="" description="" isAllowOverride="false" isLocalOnly="false" isOpen="false" isPrivate="false" name="queryValueStream"><ResultType baseType="INFOTABLE" description="" name="result" ordinal="0"/><ParameterDefinitions><FieldDefinition baseType="INTEGER" description="" name="meData" ordinal="2"/><FieldDefinition baseType="INTEGER" description="" name="param_lifetimecycle" ordinal="1"/></ParameterDefinitions></ServiceDefinition></ServiceDefinitions><EventDefinitions/><ServiceMappings/><ServiceImplementations><ServiceImplementation description="" handlerName="Script" name="insertAlarmLogintoDB"><ConfigurationTables><ConfigurationTable description="Script" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[try{
+logger.debug("TT_RTTFT_8600E_V_0_0_1  insertAlarmLogintoDB - START");
+
+var params = {
+	assetID: assetID /* STRING */,
+	Alarm3: Alarm3 /* INTEGER */,
+	Alarm4: 0 /* INTEGER */,
+	Alarm1: Alarm1 /* INTEGER */,
+	plcTimestamp: plcTimeStamp /* STRING */,
+	Alarm2: Alarm2 /* INTEGER */
+};
+
+// result: INFOTABLE
+var result = Things["SEE_FC_PostGres_Database"].calculateAlarmLog_8600E(params);
+   
+}
+catch(err){
+  logger.error("TT_RTTFT_8600E_V_0_0_1  insertAlarmLogintoDB - error" + err);  
+}   
+
+logger.debug("TT_RTTFT_8600E_V_0_0_1  insertAlarmLogintoDB - END");]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation><ServiceImplementation description="" handlerName="Script" name="insertDBRecord"><ConfigurationTables><ConfigurationTable description="Script" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[try{
+logger.debug("TT_RTTFT_8600E_V_0_0_1  InsertRecordDB - START");
+    var currentTime = Date.now();
+	var calPLCTimestamp = dateFormat(currentTime,"yyyy-MM-dd HH:mm:ss.SSS");
+   var shiftNo; 
+var shiftNoparams = {
+	plcTime: calPLCTimestamp /* STRING */,
+	assetID: me.name /* STRING */
+};
+
+// result: INFOTABLE
+var shiftNoResult= Things["SEE_FC_PostGres_Database"].calculateShiftNo(shiftNoparams);
+   shiftNo = shiftNoResult.sp_vpp_getshiftnumber;
+
+//var shiftStartTimeParams = {
+//	plcTime: calPLCTimestamp /* STRING */,
+//	assetID: me.name /* STRING */,
+//	sensorTableName: me.postgresSensorDaTable /* STRING */,
+//	shiftNo: shiftNo /* STRING */
+//};
+
+// result: INFOTABLE
+//var shiftstartTimeResult= Things["SEE_FC_PostGres_Database"].calculateShiftStartTime(shiftStartTimeParams);
+//me.shiftStrtTime =shiftstartTimeResult.sp_cognipro_calculate_shift_start_time;
+var params = {
+        state_all: state_all /* INTEGER */,
+        alarm2: alarm2 /* INTEGER */,
+        alarm1: alarm1 /* INTEGER */,
+        alarm4: undefined /* INTEGER */,
+        alarm3: alarm3 /* INTEGER */,
+        param_sealvoltage: param_sealvoltage /* INTEGER */,
+        param_lifetimecycle: param_lifetimecycle /* INTEGER */,
+        machineID: machineID /* STRING */,
+        param_sealcurrent: param_sealcurrent /* INTEGER */,
+        param_productpresent: param_productpresent /* INTEGER */,
+        param_platenumber: param_platenumber /* INTEGER */,
+        param_chambernumber: param_chambernumber /* INTEGER */,
+        param_productcount: param_productcount /* INTEGER */,
+        param_vac: param_vac /* INTEGER */,
+        plcTimeStamp: plcTimeStamp /* STRING */,
+        param_speedcpm: param_speedcpm /* INTEGER */,
+        param_speedppm:param_speedppm,
+	    shiftNo: shiftNo,
+    	shiftStTime:null
+};
+    //me.plcTimeStamp =plcTimeStamp;
+//logger.debug(" TT_RTTFT_8600E_V_0_0_1  InsertRecordDB - "+ me.name+" insertDB shiftNo "+ me.shiftNumber);
+//logger.debug("TT_RTTFT_8600E_V_0_0_1  InsertRecordDB - - "+ me.name+" insertDB shiftStTime "+ me.shiftStrtTime);
+    Things["SEE_FC_PostGres_Database"].insertVR86001ERemoteMachinesData(params);
+    //me.shiftNumber =shiftNo;
+}
+catch(err){
+  logger.error("TT_RTTFT_8600E_V_0_0_1  InsertRecordDB - error" + err);  
+}   
+
+logger.debug("TT_RTTFT_8600E_V_0_0_1  InsertRecordDB - END");]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation><ServiceImplementation description="" handlerName="Script" name="parseComplexCycleData"><ConfigurationTables><ConfigurationTable description="Script" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT_RTTFT_8600E_V_0_0_1  param_complex_cycledata  Service- STARTing " +me.name );
+var xmlInput = new XMLList(param_complex_cycledata);
+
+var params = {
+	infoTableName: 'Infotable' /* STRING */,
+	dataShapeName: 'DS_8600E_Complex_CycleData' /* DATASHAPENAME */
+};
+
+// result: INFOTABLE
+var tempInfoTable = Resources["InfoTableFunctions"].CreateInfoTableFromDataShape(params);
+var row = new Object();
+for (var i in xmlInput.Item){
+    var name = xmlInput.Item[i].Name.substring(xmlInput.Item[i].Name.lastIndexOf(".")+1);
+    var value = xmlInput.Item[i].Value;
+  switch(name) {
+    case "param_vac":
+    row.param_vac  = parseInt(value);
+    break;
+    case "param_sealcurrent":
+    row.param_sealcurrent  =parseInt(value);
+    break;
+    case "param_productpresent":
+    row.param_productpresent  = parseInt(value);
+    break;
+    case "param_productcount":
+    row.param_productcount  = parseInt(value);
+    break;
+    case "param_platennumber":
+    row.param_platennumber  = parseInt(value);
+    break;
+    case "param_lifetimecycle":
+    row.param_lifetimecycle  = parseInt(value);
+    break;
+    case "param_chambernumber":
+    row.param_chambernumber  = parseInt(value);
+    break;
+    case "_Time":
+    row._Time  = String(value);
+    break;   
+    default:
+    logger.error("TT_RTTFT_8600E_V_0_0_1  param_complex_cycledata Default Case Error " +me.name);
+	 }
+}
+tempInfoTable.AddRow(row)
+var result = tempInfoTable;
+
+
+logger.debug("TT_RTTFT_8600E_V_0_0_1  param_complex_cycledata  Service- END " +me.name );]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation><ServiceImplementation description="" handlerName="Script" name="queryNamedValueStream"><ConfigurationTables><ConfigurationTable description="Script" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[var endDate1 = Date.now();
+var startDate1 = endDate1 - 10000;
+
+
+var paramTable= Resources["InfoTableFunctions"].CreateInfoTable();
+        var field = new Object();
+        field.name = "name";
+        field.baseType = "STRING";
+        paramTable.AddField(field);
+        field.name="baseType";
+        paramTable.AddField(field);
+
+        var row = new Object();
+        row.name = "param_vac"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_sealvoltage"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_sealcurrent"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_productpresent"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_productcount"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_platennumber"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_lifetimecycle"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_chambernumber"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "state_all"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_speedcpm"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "Alarm1"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "Alarm2"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "Alarm3"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+
+
+        var params = {
+            oldestFirst: true /* BOOLEAN */,
+            maxItems: undefined/* NUMBER */,
+            endDate: endDate1 /* DATETIME */,
+            propertyNames: paramTable /* INFOTABLE */,
+            query: undefined /* QUERY */,
+            startDate: startDate1 /* DATETIME */
+        };
+        
+        // result: INFOTABLE dataShape: "undefined"
+        var result = me.QueryNamedPropertyHistory(params);]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation><ServiceImplementation description="" handlerName="Script" name="queryValueStream"><ConfigurationTables><ConfigurationTable description="Script" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT E machine queryValueStream START "+me.name); 
+var query=
+            {
+                "filters": {
+                    "type": "EQ",
+                    "fieldName": "param_lifetimecycle",
+                    "value":param_lifetimecycle
+                }
+            };
+        var paramTable= Resources["InfoTableFunctions"].CreateInfoTable();
+        var field = new Object();
+        field.name = "name";
+        field.baseType = "STRING";
+        paramTable.AddField(field);
+        field.name="baseType";
+        paramTable.AddField(field);
+
+        var row = new Object();
+        row.name = "param_vac"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_sealvoltage"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_sealcurrent"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_productpresent"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_productcount"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_platennumber"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_lifetimecycle"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_chambernumber"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_cycletime"
+        row.baseType = "STRING";
+        paramTable.AddRow(row);
+        row.name = "param_date"
+        row.baseType = "STRING";
+        paramTable.AddRow(row);
+        row.name = "state_all"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "param_speedcpm"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "Alarm1"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "Alarm2"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+        row.name = "Alarm3"
+        row.baseType = "INTEGER";
+        paramTable.AddRow(row);
+
+
+        var params = {
+            oldestFirst: undefined /* BOOLEAN */,
+            maxItems: 1 /* NUMBER */,
+            endDate: undefined /* DATETIME */,
+            propertyNames: paramTable /* INFOTABLE */,
+            query: undefined /* QUERY */,
+            startDate: undefined /* DATETIME */
+        };
+        
+        // result: INFOTABLE dataShape: "undefined"
+        var result = me.QueryNamedPropertyHistory(params);
+
+logger.debug("TT E machine queryValueStream END "+me.name); 
+]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></ServiceImplementations><Subscriptions><Subscription enabled="true" eventName="DataChange" source="" sourceProperty="Alarm1"><ServiceImplementation description="" handlerName="Script" name="Event.DataChange:Property.Alarm1"><ConfigurationTables><ConfigurationTable description="" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT_RTTFT_8600E_V_0_0_1  Data Change subscription for Alarm1 - START");
+
+try{
+
+var params = {
+	assetID: me.name /* STRING */,
+	plcTimeStamp: me.plcTimeStamp /* STRING */,
+	Alarm1: me.Alarm1 /* INTEGER */,
+	Alarm2: me.Alarm2 /* INTEGER */,
+	Alarm3: me.Alarm3 /* INTEGER */,
+	Alarm4: undefined /* INTEGER */
+};
+
+me.insertAlarmLogintoDB(params);
+
+
+
+}
+catch(e){
+    logger.error("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for Alarm1 - Exception "+e);
+}
+
+logger.debug("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for Alarm1 - END");]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></Subscription><Subscription enabled="true" eventName="DataChange" source="" sourceProperty="Alarm2"><ServiceImplementation description="" handlerName="Script" name="Event.DataChange:Property.Alarm2"><ConfigurationTables><ConfigurationTable description="" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT_RTTFT_8600E_V_0_0_1  Data Change subscription for Alarm2 - START");
+
+try{
+var params = {
+	assetID: me.name /* STRING */,
+	plcTimeStamp: me.plcTimeStamp /* STRING */,
+	Alarm1: me.Alarm1 /* INTEGER */,
+	Alarm2: me.Alarm2 /* INTEGER */,
+	Alarm3: me.Alarm3 /* INTEGER */,
+	Alarm4: undefined /* INTEGER */
+};
+
+me.insertAlarmLogintoDB(params);
+}
+catch(e){
+    logger.error("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for Alarm2 - Exception "+e);
+}
+
+logger.debug("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for Alarm2 - END");]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></Subscription><Subscription enabled="true" eventName="DataChange" source="" sourceProperty="Alarm3"><ServiceImplementation description="" handlerName="Script" name="Event.DataChange:Property.Alarm3"><ConfigurationTables><ConfigurationTable description="" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT_RTTFT_8600E_V_0_0_1  Data Change subscription for Alarm3 - START");
+
+try{
+var params = {
+	assetID: me.name /* STRING */,
+	plcTimeStamp: me.plcTimeStamp /* STRING */,
+	Alarm1: me.Alarm1 /* INTEGER */,
+	Alarm2: me.Alarm2 /* INTEGER */,
+	Alarm3: me.Alarm3 /* INTEGER */,
+	Alarm4: undefined /* INTEGER */
+};
+
+me.insertAlarmLogintoDB(params);
+
+}
+catch(e){
+    logger.error("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for Alarm3 - Exception "+e);
+}
+
+logger.debug("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for Alarm3 - END");]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></Subscription><Subscription enabled="true" eventName="DataChange" source="" sourceProperty="param_lifetimecycle"><ServiceImplementation description="" handlerName="Script" name="Event.DataChange:Property.param_lifetimecycle"><ConfigurationTables><ConfigurationTable description="" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT_RTTFT_8600E_V_0_0_1  Data Change subscription for lifetimecycle - START " +me.name );//+ " EventData "+eventData.ToJSON());
+	
+    var eventData = eventData.newValue.value; //100
+	var meData = me.param_lifetimecycle;//101
+try{
+    if(eventData !=meData){
+        //logger.error(" IF Name TT 8600 E Name  Data mismatch: "+me.name);
+        me.dataMismatchCount = me.dataMismatchCount +1;
+    }else{
+    var tempResult = me.GetPropertyValues();
+    var calPLCTimestamp=tempResult.param_date+" "+tempResult.param_cycletime;
+    var params = {
+        state_all: tempResult.state_all /* INTEGER */,
+        alarm2: tempResult.Alarm2 /* INTEGER */,
+        alarm1: tempResult.Alarm1 /* INTEGER */,
+        alarm4: undefined /* INTEGER */,
+        alarm3: tempResult.Alarm3 /* INTEGER */,
+        param_sealvoltage: tempResult.param_sealvoltage /* INTEGER */,
+        param_lifetimecycle: tempResult.param_lifetimecycle/* INTEGER */,
+        machineID: tempResult.name /* STRING */,
+        param_sealcurrent: tempResult.param_sealcurrent /* INTEGER */,
+        param_productpresent: tempResult.param_productpresent /* INTEGER */,
+        param_platenumber: tempResult.param_platennumber /* INTEGER */,
+        param_chambernumber: tempResult.param_chambernumber /* INTEGER */,
+        param_productcount: tempResult.param_productcount /* INTEGER */,
+        param_vac: tempResult.param_vac /* INTEGER */,
+        plcTimeStamp: calPLCTimestamp /* STRING */,
+        param_speedcpm:tempResult.param_speedcpm /* INTEGER */,
+        param_speedppm:tempResult.param_speedcpm
+    };
+
+    // no return
+    me.insertDBRecord(params);
+  }      
+}
+catch(e){
+   // logger.error(me.name +" Name on Exception TT 8600E : event Data : "+eventData+"me.paramLifeTime : "+meData);
+    logger.error("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for lifetimecycle - Exception "+e);
+}
+
+//logger.debug("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for lifetimecycle - END "+me.name);]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></Subscription><Subscription enabled="false" eventName="DataChange" source="" sourceProperty="param_lifetimecycles"><ServiceImplementation description="" handlerName="Script" name="Event.DataChange:Property.param_lifetimecycles"><ConfigurationTables><ConfigurationTable description="" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT_RTTFT_8600E_V_0_0_1  Data Change subscription for lifetimecycle - START " +me.name );//+ " EventData "+eventData.ToJSON());
+	
+    var eventData = eventData.newValue.value; //100
+	var meData = me.param_lifetimecycle;//101
+try{
+    if(eventData !=meData){
+        //logger.error(" IF Name TT 8600 E Name  Data mismatch: "+me.name);
+        me.dataMismatchCount = me.dataMismatchCount +1;
+    }else{
+    var tempResult = me.GetPropertyValues();
+    var calPLCTimestamp=tempResult.param_date+" "+tempResult.param_cycletime;
+    var params = {
+        state_all: tempResult.state_all /* INTEGER */,
+        alarm2: tempResult.Alarm2 /* INTEGER */,
+        alarm1: tempResult.Alarm1 /* INTEGER */,
+        alarm4: undefined /* INTEGER */,
+        alarm3: tempResult.Alarm3 /* INTEGER */,
+        param_sealvoltage: tempResult.param_sealvoltage /* INTEGER */,
+        param_lifetimecycle: tempResult.param_lifetimecycles/* INTEGER */,
+        machineID: tempResult.name /* STRING */,
+        param_sealcurrent: tempResult.param_sealcurrent /* INTEGER */,
+        param_productpresent: tempResult.param_productpresent /* INTEGER */,
+        param_platenumber: tempResult.param_platennumber /* INTEGER */,
+        param_chambernumber: tempResult.param_chambernumber /* INTEGER */,
+        param_productcount: tempResult.param_productcount /* INTEGER */,
+        param_vac: tempResult.param_vac /* INTEGER */,
+        plcTimeStamp: calPLCTimestamp /* STRING */,
+        param_speedcpm:tempResult.param_speedcpm /* INTEGER */,
+        param_speedppm:tempResult.param_speedcpm
+    };
+
+    // no return
+    me.insertDBRecord(params);
+  }      
+}
+catch(e){
+   // logger.error(me.name +" Name on Exception TT 8600E : event Data : "+eventData+"me.paramLifeTime : "+meData);
+    logger.error("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for lifetimecycle - Exception "+e);
+}
+
+//logger.debug("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for lifetimecycle - END "+me.name);]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></Subscription><Subscription enabled="true" eventName="DataChange" source="" sourceProperty="shiftNumber"><ServiceImplementation description="" handlerName="Script" name="Event.DataChange:Property.shiftNumber"><ConfigurationTables><ConfigurationTable description="" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TTFT_8600E - ShiftNo change subscription START "+me.name);
+try {
+if(eventData.oldValue.value!='' && eventData.oldValue.value!=undefined){
+
+var params = {
+	assetID: me.name /* STRING */,
+	par_current_shift: eventData.newValue.value /* STRING */,
+	par_shift_start_time: me.shiftStrtTime /* STRING */,
+	par_last_shift: eventData.oldValue.value /* STRING */
+};
+
+// result: INFOTABLE
+var result = Things["SEE_FC_PostGres_Database"].calculateKPIbyShift_8600E(params);
+
+}
+
+
+    
+} catch(err) {
+logger.error("TTFT_8600E- ShiftNo change subscription Error "+err +" "+me.name);
+}
+
+logger.debug("TTFT_8600E - ShiftNo change subscription END "+me.name);]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></Subscription><Subscription enabled="true" eventName="DataChange" source="" sourceProperty="state_all"><ServiceImplementation description="" handlerName="Script" name="Event.DataChange:Property.state_all"><ConfigurationTables><ConfigurationTable description="" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT_RTTFT_8600E_V_0_0_1  Data Change subscription for state_all - START");
+
+try{
+//var currentdate = new Date();
+   //var dateVal = (currentdate.getMonth()+1) + "/" +currentdate.getDate() + "/" + currentdate.getFullYear();
+// result: INFOTABLE dataShape: "undefined"
+	var tempResult = me.GetPropertyValues();
+    var calPLCTimestamp=tempResult.param_date+" "+tempResult.param_cycletime;
+    logger.debug("TT_RTTFT_8600E_V_0_0_1   param cycle Time stamp: "+calPLCTimestamp);
+    var params = {
+        state_all: eventData.newValue.value /* INTEGER */,
+        alarm2: tempResult.Alarm2 /* INTEGER */,
+        alarm1: tempResult.Alarm1 /* INTEGER */,
+        alarm4: undefined /* INTEGER */,
+        alarm3: tempResult.Alarm3 /* INTEGER */,
+        param_sealvoltage: tempResult.param_sealvoltage /* INTEGER */,
+        param_lifetimecycle: tempResult.param_lifetimecycle /* INTEGER */,
+        machineID: tempResult.name /* STRING */,
+        param_sealcurrent: tempResult.param_sealcurrent /* INTEGER */,
+        param_productpresent: tempResult.param_productpresent /* INTEGER */,
+        param_platenumber: tempResult.param_platennumber /* INTEGER */,
+        param_chambernumber: tempResult.param_chambernumber /* INTEGER */,
+        param_productcount: tempResult.param_productcount /* INTEGER */,
+        param_vac: tempResult.param_vac /* INTEGER */,
+        plcTimeStamp: calPLCTimestamp /* STRING */,
+        param_speedcpm:tempResult.param_speedcpm /* INTEGER */,
+        param_speedppm:tempResult.param_speedcpm
+    };
+
+    // no return
+	me.insertDBRecord(params);
+}
+catch(e){
+    logger.error("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for state_all - Exception "+e);
+}
+
+logger.debug("TT_RTTFT_8600E_V_0_0_1 DailyPackCounter Data Change subscription for state_all - END");]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></Subscription><Subscription enabled="true" eventName="Timer" source="postGres_8600E_1hrTimer" sourceProperty=""><ServiceImplementation description="" handlerName="Script" name="Type.Thing:Entity.postGres_8600E_1hrTimer:Event.Timer"><ConfigurationTables><ConfigurationTable description="" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT_RTTFT_8600E 1hr Subscription START "+me.name);
+try {
+
+var params = {
+	assetID: me.name /* STRING */
+};
+
+// result: INFOTABLE
+var result = Things["SEE_FC_PostGres_Database"].calculateKPIbyHour_8600E(params);
+
+
+    
+} catch(err) {
+logger.error("TT_RTTFT_8600E 1hr Subscription error "+err+" "+me.name);
+}
+  
+logger.debug("TT_RTTFT_8600E 1hr Subscription END "+me.name);]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></Subscription><Subscription enabled="true" eventName="Timer" source="postGres_8600E_1minTimer_V1" sourceProperty=""><ServiceImplementation description="" handlerName="Script" name="Type.Thing:Entity.postGres_8600E_1minTimer_V1:Event.Timer"><ConfigurationTables><ConfigurationTable description="" isMultiRow="false" name="Script" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition baseType="STRING" description="code" name="code" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><code><![CDATA[logger.debug("TT_RTTFT_8600-E  - 1 min subscription STARTing "+me.name);
+try {
+ //var currentdate = new Date();
+   //var dateVal = (currentdate.getMonth()+1) + "/" +currentdate.getDate() + "/" + currentdate.getFullYear();
+    //var calPLCTimestamp=me.param_date+" "+me.param_cycletime;
+//    
+    var currentTime = Date.now();
+	var calPLCTimestamp = dateFormat(currentTime,"yyyy-MM-dd HH:mm:ss.SSS");
+   var shiftNo; 
+var shiftNoparams = {
+	plcTime: calPLCTimestamp /* STRING */,
+	assetID: me.name /* STRING */
+};
+
+// result: INFOTABLE
+var shiftNoResult= Things["SEE_FC_PostGres_Database"].calculateShiftNo(shiftNoparams);
+   shiftNo = shiftNoResult.sp_vpp_getshiftnumber;
+//
+//var shiftStartTimeParams = {
+//	plcTime: calPLCTimestamp /* STRING */,
+//	assetID: me.name /* STRING */,
+//	sensorTableName: me.postgresSensorDaTable /* STRING */,
+//	shiftNo: shiftNo /* STRING */
+//};
+//
+//// result: INFOTABLE
+//var shiftstartTimeResult= Things["SEE_FC_PostGres_Database"].calculateShiftStartTime(shiftStartTimeParams);
+//me.shiftStrtTime =shiftstartTimeResult.sp_cognipro_calculate_shift_start_time;
+    
+var calcParams = {
+	assetID: me.name /* STRING */
+};
+
+// result: INFOTABLE
+var result = Things["SEE_FC_PostGres_Database"].calculateKPIbyMinute_8600E(calcParams);
+me.shiftNumber= shiftNo;
+   
+} catch(err) {
+logger.error("TT_RTTFT_8600-E - 1 min subscription Error message "+err +" " +me.name);
+}    
+logger.debug("TT_RTTFT_8600-E - 1 min subscription END "+me.name);]]></code></Row></Rows></ConfigurationTable></ConfigurationTables></ServiceImplementation></Subscription></Subscriptions></ThingShape><ImplementedShapes><ImplementedShape name="IndustrialThingShape" type="ThingShape"/><ImplementedShape name="TS_8600_E_Cognipro_Alarms" type="ThingShape"/><ImplementedShape name="TS_8600_E_Cognipro_KPI" type="ThingShape"/><ImplementedShape name="TS_VR8600E_Cognipro_Parameters" type="ThingShape"/><ImplementedShape name="TS_8600_E_CogniPro_Messages" type="ThingShape"/></ImplementedShapes><SharedConfigurationTables><ConfigurationTable description="Shared Tunneling Destinations" isMultiRow="true" name="SharedTunnels" ordinal="1"><DataShape><FieldDefinitions><FieldDefinition aspect.friendlyName="Application Path" baseType="STRING" description="Location of the client app that will use this tunnel" name="appUri" ordinal="5"/><FieldDefinition aspect.friendlyName="Description" baseType="STRING" description="A description of the tunnel" name="description" ordinal="3"/><FieldDefinition aspect.friendlyName="Host" baseType="STRING" description="Host or IP that this tunnel will connect to at the edge" name="host" ordinal="1"/><FieldDefinition aspect.friendlyName="Name" baseType="STRING" description="Name of the tunnel" name="name" ordinal="0"/><FieldDefinition aspect.friendlyName="Number of Connects" baseType="NUMBER" description="The number of connections required to establish this tunnel" name="numConnects" ordinal="4"/><FieldDefinition aspect.friendlyName="Port" baseType="NUMBER" description="Port that this tunnel will connect to at the edge" name="port" ordinal="2"/><FieldDefinition aspect.friendlyName="Protocol" baseType="STRING" description="The protocol used over this tunnel" name="proto" ordinal="6"/></FieldDefinitions></DataShape><Rows/></ConfigurationTable><ConfigurationTable description="Shared Remote Tunneling Settings" isMultiRow="false" name="SharedTunnelSettings" ordinal="0"><DataShape><FieldDefinitions><FieldDefinition aspect.defaultValue="false" aspect.friendlyName="Enable Tunneling" baseType="BOOLEAN" description="Enable tunneling" name="enableTunneling" ordinal="0"/></FieldDefinitions></DataShape><Rows><Row><enableTunneling>false</enableTunneling></Row></Rows></ConfigurationTable></SharedConfigurationTables><InstanceDesignTimePermissions><Create/><Read/><Update/><Delete/><Metadata/></InstanceDesignTimePermissions><InstanceRunTimePermissions/><InstanceVisibilityPermissions><Visibility/></InstanceVisibilityPermissions><ConfigurationChanges><ConfigurationChange changeAction="CREATE" changeReason="header : name : updated, description : updated, valueStream : updated, documentationContent : updated&#10;" timestamp="2017-10-26T14:27:40.602Z" user="Brandon"/><ConfigurationChange changeAction="MODIFY" changeReason="header : tags : updated&#10;" timestamp="2017-10-27T19:58:18.000Z" user="Jennifer"/></ConfigurationChanges></ThingTemplate></ThingTemplates></Entities>
