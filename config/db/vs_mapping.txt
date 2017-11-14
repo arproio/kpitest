@@ -1,0 +1,11 @@
+0 availability real,
+1 throughputcycles real,
+2 throughput real,
+3 cyclesperminute real,
+4 vacreached real,
+5 efficiency real,
+6 deviation real,
+7 capacitypotential real,
+8 starttime character varying,
+9 endtime character varying,
+10  machineid character varying

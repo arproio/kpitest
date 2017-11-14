@@ -1,0 +1,10 @@
+0 average real,
+1 cyclecount integer,
+2 productcount integer,
+3 throughput real,
+4 availability real,
+5 capacitypotential real,
+6 efficiency real,
+7 starttime character varying,
+8 endtime character varying,
+9 machineid character varying
