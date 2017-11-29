@@ -1,4 +1,4 @@
-CREATE OR REPLACE FUNCTION public.get_shift_info(line_name character varying, par_timestamp character varying)
+CREATE OR REPLACE FUNCTION public.get_shift_info_test(line_name character varying, par_timestamp character varying)
  RETURNS TABLE(shiftinstanceid integer, shiftid integer, linename character varying, shiftname character varying, starttime character varying, endtime character varying, weekday character varying)
  LANGUAGE plpgsql
  STABLE
@@ -88,9 +88,9 @@ begin
 		and (var_timepart::time >= b.shiftstarttime::time and var_timepart::time < b.shiftendtime::time) 
 	end;
 		
---	raise notice 'var_timepart: %',var_timepart;
---	raise notice 'var_weekday: %', var_weekday;
---
+	raise notice 'var_timepart: %',var_timepart;
+	raise notice 'var_weekday: %', var_weekday;
+
 --	raise notice 'var_after_weekday: %', var_after_weekday;
 --	raise notice 'var_starttime: %', var_starttime;
 --	raise notice 'var_endtime: %', var_endtime;
@@ -104,15 +104,9 @@ begin
 		into var_starttime, var_starttime_weekday, var_endtime, var_endtime_weekday
 		from public.get_shiftx(line_name, par_timestamp) shiftx;
 		
-		raise notice 'var_starttime: %', var_starttime;
-		raise notice 'var_starttime_weekday: %', var_starttime_weekday;
-		raise notice 'var_endtime: %', var_endtime;
-		raise notice 'var_endtime_weekday: %', var_endtime_weekday;
-		
 		--get start date time
 		var_start_day_diff := var_weekday - var_starttime_weekday;
-		raise notice 'var_weekday: %', var_weekday;
-		raise notice 'var_start_day_diff: %', var_start_day_diff;
+		
 		if var_start_day_diff < 0 then
 			var_start_day_diff := var_start_day_diff + 7; 
 		elseif var_start_day_diff = 0 then
@@ -132,24 +126,24 @@ begin
     		
     		--get end date time 
     		var_end_day_diff := var_endtime_weekday - var_weekday;
-    		--raise notice 'var_end_day_diff:% - % = %',var_endtime_weekday,var_weekday,var_end_day_diff;
+    		raise notice 'var_end_day_diff:% - % = %',var_endtime_weekday,var_weekday,var_end_day_diff;
     		if var_end_day_diff < 0 then
 			var_end_day_diff := var_end_day_diff + 7;
 		elseif var_end_day_diff = 0 then
 			if var_starttime_weekday = var_endtime_weekday and var_starttime::time > var_endtime::time then
-				--raise notice 'HERE';
-				--raise notice '% - %', var_starttime::time, var_endtime::time;
+				raise notice 'HERE';
+				raise notice '% - %', var_starttime::time, var_endtime::time;
 				var_end_day_diff := var_end_day_diff + 7;
 			end if;
 		end if;
-    		--raise notice 'var_end_day_diff after: %', var_end_day_diff;
+    		raise notice 'var_end_day_diff after: %', var_end_day_diff;
 
 		select var_timestamp + INTERVAL '1 day' * var_end_day_diff
     		into var_endtime_string;
 		
     		
     		var_timestamp_endtime := to_timestamp(var_endtime_string,'YYYY-MM-DD HH24:MI:SS');
-    		--raise notice 'var_timestamp_endtime: %', var_timestamp_endtime;
+    		raise notice 'var_timestamp_endtime: %', var_timestamp_endtime;
 		var_shift_end_time_return := date_part('year', var_timestamp_endtime) ||''|| 
 		to_char(date_part('month', var_timestamp_endtime), 'fm00')||''||
 		to_char(date_part('day', var_timestamp_endtime), 'fm00') || to_char(var_endtime::time,'HH24MISS');

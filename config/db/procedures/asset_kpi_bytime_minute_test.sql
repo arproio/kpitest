@@ -1,5 +1,5 @@
-CREATE OR REPLACE FUNCTION public.asset_kpi_bytime_hour(value_stream_name character varying, stream_name character varying, machine_id character varying, machine_type character varying, start_time_string character varying, end_time_string character varying, ideal_run_rate integer, shift_name character varying, kpi_date character varying, kpi_hour character varying)
- RETURNS TABLE(totalcount integer, rejectcount integer)
+CREATE OR REPLACE FUNCTION public.asset_kpi_bytime_minute_test(value_stream_name character varying, stream_name character varying, machine_id character varying, machine_type character varying, start_time_string character varying, end_time_string character varying, ideal_run_rate integer, shift_name character varying, kpi_date character varying, kpi_hour character varying, kpi_minute character varying)
+ RETURNS void
  LANGUAGE plpgsql
 AS $function$
 -- value_stream_name: this is the associated value stream on Thing general info page.
@@ -118,20 +118,11 @@ declare
 	
 	var_sqlquery varchar(5000);
 	var_channel_last real;
-
-	prerec_cycle record;
-	prerec_param record;
-
-	rec_cycle record;
-	rec_param record;
-
-	var_efficiency_count real;
-	var_deviation_count real;
-	var_counter real;
+	
 	
 
 begin
-	-- raise notice 'machine_id: %', machine_id;
+	-- -- raise notice'machine_id: %', machine_id;
 --	var_sqlquery := 'insert into cognipro.hour_kpiresults(machine_id, kpi_date, kpi_hour, shift) values(''' || machine_id ||''',''' || kpi_date ||''',''' || kpi_hour ||''',''' || shift_name || ''');';
 --	perform dblink_exec('ExternalConnection', var_sqlquery);
 	select into var_end_time (to_timestamp(end_time_string,'YYYYMMDDHH24MISS')::timestamp with time zone) ;
@@ -170,7 +161,7 @@ begin
 			and time < var_end_time and time > var_start_time
 			order by time
 		LOOP
-			-- -- raise notice '%:% - %:%', var_last_time, var_last_value, rec.time, rec.property_value;
+			-- -- -- raise notice'%:% - %:%', var_last_time, var_last_value, rec.time, rec.property_value;
 			if var_last_value = 'true' then
 				available_runtime_in_sec := extract(epoch from rec.time - var_last_time)+ available_runtime_in_sec;
 			END IF;
@@ -181,10 +172,10 @@ begin
 		if var_last_value = '1' then
 			available_runtime_in_sec := extract(epoch from var_end_time - var_last_time)+ available_runtime_in_sec;
 		END IF;
-		-- -- raise notice 'End at:%', now();
+		-- -- -- raise notice'End at:%', now();
 		var_efficiency_return := available_runtime_in_sec / duration_in_sec;
 		
-		-- raise notice 'var_efficiency_return: %', var_efficiency_return;
+		-- -- raise notice'var_efficiency_return: %', var_efficiency_return;
 		------------------------------ Availability ---------------------------------
 		
 		var_last_stop_val := '0';
@@ -221,11 +212,11 @@ begin
 		if var_last_stop_val = 'true' then
 			available_stoptime_in_sec := extract(epoch from var_end_time - var_last_time)+ available_stoptime_in_sec;
 		end if;
-		-- raise notice 'available_stoptime_in_sec: %', available_stoptime_in_sec;
-		-- -- raise notice 'End at:%', now();
+		-- -- raise notice'available_stoptime_in_sec: %', available_stoptime_in_sec;
+		-- -- -- raise notice'End at:%', now();
 		var_availability_return := (available_runtime_in_sec + available_stoptime_in_sec) / duration_in_sec;
 		
-		-- raise notice 'var_availability_return: %', var_availability_return;
+		-- -- raise notice'var_availability_return: %', var_availability_return;
 		------------------------Cycle Dependent KPIs----------------------------
 		--Property Name: param_totalpackcount
 		var_count_last := 0;
@@ -255,7 +246,7 @@ begin
 	
 		--default values
 		var_reject_return := 0.0;
-		var_good_product_count := 0;
+		var_good_product_count := 0.0;
 		var_giveaway_return := 0.0;
 		var_sum_lastpackageweight := 0.0;
 		var_absdeviation := 0.0;
@@ -266,6 +257,8 @@ begin
 			and time < var_end_time and time > var_start_time
 			order by time
 		LOOP
+		
+			raise notice 'state_machinerunning: %', rec.field_values->>'state_machinerunning';
 			
 			-- Give Away
 			if rec.field_values->>'state_machinerunning' = 'true' then
@@ -297,6 +290,8 @@ begin
 	--		var_last_run_val := rec.field_values->>'state_machinerunning';
 		
 		END LOOP;
+		raise notice 'var_good_product_count: %',var_good_product_count;
+		raise notice 'var_total_pack_count: %', var_total_pack_count;
 		
 		if var_total_pack_count > 0 then	
 			var_good_product_return := var_good_product_count / var_total_pack_count * 100;
@@ -308,11 +303,11 @@ begin
 	        var_productaverage_return := 0;
 		end if;
 		
-		-- raise notice 'var_good_product_return: %', var_good_product_return;
-		-- raise notice 'var_sdi_return: %', var_sdi_return;
-		-- raise notice 'var_productaverage_return: %', var_productaverage_return;
-		-- raise notice 'var_giveaway_return: %', var_giveaway_return;
-		-- raise notice 'var_reject_return: %', var_reject_return;
+		raise notice'var_good_product_return: %', var_good_product_return;
+		-- -- raise notice'var_sdi_return: %', var_sdi_return;
+		-- -- raise notice'var_productaverage_return: %', var_productaverage_return;
+		-- -- raise notice'var_giveaway_return: %', var_giveaway_return;
+		-- -- raise notice'var_reject_return: %', var_reject_return;
 		
 		------------------------------ Fault Rate ---------------------------------
 		-- NEED TO DETERMINE IF GRANULARITY CALC OR REALTIME TO DETERMINE START TIME
@@ -335,7 +330,7 @@ begin
 			and time < var_end_time and time > var_start_time
 			order by time
 		LOOP
-			-- -- raise notice '%:% - %:%', var_last_time, var_last_value, rec.time, rec.property_value;
+			-- -- -- raise notice'%:% - %:%', var_last_time, var_last_value, rec.time, rec.property_value;
 			if var_last_value = 'true' then
 				available_faulttime_in_sec := extract(epoch from rec.time - var_last_time)+ available_faulttime_in_sec;
 			END IF;
@@ -346,12 +341,13 @@ begin
 		if var_last_value = 'true' then
 			available_faulttime_in_sec := extract(epoch from var_end_time - var_last_time)+ available_faulttime_in_sec;
 		END IF;
-		-- -- raise notice 'End at:%', now();
+		-- -- -- raise notice'End at:%', now();
 		var_faultrate_return := available_faulttime_in_sec / duration_in_sec;
 		
-		-- raise notice 'var_faultrate_return: %', var_faultrate_return;
+		-- -- raise notice'var_faultrate_return: %', var_faultrate_return;
 		
 		------------------------------ Performance ----------------------------------
+		
 		for rec in
 		select field_values from stream 
 		where entity_id=stream_name and source_id=machine_id
@@ -367,7 +363,7 @@ begin
 --		from public.irrconfig
 --		where asset_id = machine_id
 --		and channelnumber = var_channel_last::real;
-	
+		
 		var_idealrunrate := ideal_run_rate;
 		
 		if available_runtime_in_sec <= 0.0 then
@@ -378,11 +374,11 @@ begin
 			var_performance_return := ((var_total_pack_count * 60 /available_runtime_in_sec) / var_idealrunrate) * 100;
 		END IF;
 		
-		-- raise notice 'var_performance_return: %', var_performance_return;
+		-- -- raise notice'var_performance_return: %', var_performance_return;
 		---------------------Capaciy Potential----------------------------------
 		var_capacity_potential_return := 100 - var_performance_return;
 		
-		-- raise notice 'var_capacity_potential_return: %', var_capacity_potential_return;
+		-- -- raise notice'var_capacity_potential_return: %', var_capacity_potential_return;
 		
 		--------------------------- Averages -------------------------------------
 		var_machinespeed_last := 0.0;
@@ -462,7 +458,7 @@ begin
 		var_endsealtemperature_total := var_time_gap * var_endsealtemperature_last + var_endsealtemperature_total;
 		var_endremtemppv_total := var_time_gap * var_endremtemppv_last + var_endremtemppv_total;
 		
-		-- -- raise notice 'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
+		-- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
 		
 		var_machinespeed_average_return := var_machinespeed_total / duration_in_sec; 
 		var_pumpinvspeed_average_return := var_pumpinvspeed_total / duration_in_sec; 
@@ -474,25 +470,25 @@ begin
 		var_endremtemppv_average_return := var_endremtemppv_total / duration_in_sec;
 		
 		
-		-- raise notice 'var_machinespeed_average_return: %',var_machinespeed_average_return;
-		-- raise notice 'var_pumpinvspeed_average_return: %', var_pumpinvspeed_average_return;
-		-- raise notice 'var_filmfeedlength_average_return: %',var_filmfeedlength_average_return;
-		-- raise notice 'var_centersealtime_average_return: %', var_centersealtime_average_return;
-		-- raise notice 'var_endsealtime_average_return: %', var_endsealtime_average_return;
-		-- raise notice 'var_centersealtemperature_average_return: %',var_centersealtemperature_average_return;
-		-- raise notice 'var_endsealtemperature_average_return: %', var_endsealtemperature_average_return;
-		-- raise notice 'var_endremtemppv_average_return: %', var_endremtemppv_average_return;
+		-- -- raise notice'var_machinespeed_average_return: %',var_machinespeed_average_return;
+		-- -- raise notice'var_pumpinvspeed_average_return: %', var_pumpinvspeed_average_return;
+		-- -- raise notice'var_totalpackcount_average_return: %', var_totalpackcount_average_return;
+		-- -- raise notice'var_filmfeedlength_average_return: %',var_filmfeedlength_average_return;
+		-- -- raise notice'var_centersealtime_average_return: %', var_centersealtime_average_return;
+		-- -- raise notice'var_endsealtime_average_return: %', var_endsealtime_average_return;
+		-- -- raise notice'var_centersealtemperature_average_return: %',var_centersealtemperature_average_return;
+		-- -- raise notice'var_endsealtemperature_average_return: %', var_endsealtemperature_average_return;
+		-- -- raise notice'var_endremtemppv_average_return: %', var_endremtemppv_average_return;
 		
 		
 		
 		-------------------------------------- Insert Values into Table --------------------------------
 
-		var_sqlquery := 'insert into cognipro.hour_kpiresults(machine_id,
+		var_sqlquery := 'insert into cognipro.minute_kpiresults(machine_id,
 															kpi_date,
-															kpi_hour,
+															kpi_minute,
 															starttime,
 															endtime,
-															shift,
 															kpi_efficiency,
 															kpi_availability,
 															kpi_giveaway,
@@ -519,14 +515,13 @@ begin
 															param_speedcpm,
 															param_lifetimecycles,
 															param_lifetimecycle,
-															param_productcount,
-															kpi_planprodtime) 
+															param_productcount
+															) 
 													values(''' || machine_id ||''',
 														   ''' || kpi_date ||''',
-														   ''' || kpi_hour ||''', 
+														   ''' || kpi_hour || kpi_minute ||''', 
 														   ''' || var_start_time||''',
 														   ''' || var_end_time||''',
-														   ''' || shift_name || ''',
 															 ' || var_efficiency_return ||',
 															 ' || var_availability_return ||',
 															 ' || var_giveaway_return ||',
@@ -546,19 +541,17 @@ begin
 															 ' || var_total_pack_count ||',
 															 ' || var_centersealtime_average_return ||',
 															 ' || var_endsealtime_average_return ||',
-														     ' || var_filmfeedlength_average_return ||',0,0,0,0,0);';
-		---- raise notice 'var_sqlquery: %', var_sqlquery;
-		perform dblink_exec('ExternalConnection', var_sqlquery);
+														     ' || var_filmfeedlength_average_return ||',0,0,0,0);';
+		raise notice'var_sqlquery: %', var_sqlquery;
+		--perform dblink_exec('ExternalConnection', var_sqlquery);
 		
 		
-		TOTALCOUNT := var_total_pack_count;
-		REJECTCOUNT := var_reject_return;
 		
 		
 	elseif machine_type = 'VR8600E' or machine_type = 'VR86001X' then
 	
 		----------------------------    Average Param_speedcpm Calculation ---------------
-		-- raise notice 'machine_id: %', machine_id;
+		-- -- raise notice'machine_id: %', machine_id;
 		var_speedcpm_last := 0.0;
 		for prerec in 
 		select time, property_value from value_stream
@@ -586,7 +579,7 @@ begin
 		END LOOP;
 	
 		var_total := extract(epoch from var_end_time - var_last_time) * var_speedcpm_last + var_total;
-		-- -- raise notice 'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
+		-- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
 	
 		var_average_machinespeed_return := var_total / duration_in_sec;
 	
@@ -691,7 +684,7 @@ begin
 			and time < var_end_time and time > var_start_time
 			order by time
 		LOOP
-			-- -- raise notice '%:% - %:%', var_last_time, var_last_value, rec.time, rec.property_value;
+			-- -- -- raise notice'%:% - %:%', var_last_time, var_last_value, rec.time, rec.property_value;
 			if var_last_value = '1' then
 				available_runtime_in_sec := extract(epoch from rec.time - var_last_time)+ available_runtime_in_sec;
 			ELSEIF var_last_value = '2' then
@@ -710,18 +703,19 @@ begin
 		ELSEIF var_last_value = '3' then
 			available_runtime_in_sec := extract(epoch from var_end_time - var_last_time)+ available_runtime_in_sec;
 		END IF;
-		-- -- raise notice 'End at:%', now();
+		-- -- -- raise notice'End at:%', now();
 		var_availability_return := (available_runtime_in_sec+available_stoptime_in_sec)/duration_in_sec;
 		
 		
 		
 		------------------------------------------ Capacity Potential ------------------------------------------------------------
+
 --		select idealrunrate
 --		into var_idealrunrate
 --		from public.irrconfig
 --		where asset_id = machine_id
 --		and channelnumber = 1;
-
+		
 		var_idealrunrate := ideal_run_rate;
 		
 		if available_runtime_in_sec <= 0.0 then
@@ -732,11 +726,10 @@ begin
 			var_capacity_potential_return := 1.0 - ((var_productcount_return * 60 /available_runtime_in_sec) / var_idealrunrate);
 		END IF;
 		
-		-- raise notice 'available_runtime_in_sec: %', available_runtime_in_sec;
+		-- -- raise notice'available_runtime_in_sec: %', available_runtime_in_sec;
 		
 		
 		----------------------------- Efficiency -------------------------------------
-
 		if machine_type = 'VR8600E' then
 		
 			if var_count_return_e > 0 then
@@ -757,12 +750,11 @@ begin
 		
 		
 		---------------------------------------- Insert Into Kpi Table--------------------------------------
-		var_sqlquery := 'insert into cognipro.hour_kpiresults(machine_id,
+		var_sqlquery := 'insert into cognipro.minute_kpiresults(machine_id,
 															kpi_date,
-															kpi_hour,
+															kpi_minute,
 															starttime,
 															endtime,
-															shift,
 															kpi_efficiency,
 															kpi_availability,
 															kpi_giveaway,
@@ -789,14 +781,12 @@ begin
 															param_speedcpm,
 															param_lifetimecycles,
 															param_lifetimecycle,
-															param_productcount,
-															kpi_planprodtime) 
+															param_productcount) 
 													values(''' || machine_id ||''',
 														   ''' || kpi_date ||''',
-														   ''' || kpi_hour ||''', 
+														   ''' || kpi_hour|| kpi_minute ||''', 
 														   ''' || var_start_time||''',
 														   ''' || var_end_time||''',
-														   ''' || shift_name || ''',
 															 ' || var_efficiency_return ||',
 															 ' || var_availability_return ||',
 															 0,0,0,0,0,0,0,
@@ -806,33 +796,29 @@ begin
 															 ' || var_average_machinespeed_return ||',
 															 ' || var_count_return_1x || ', 
 															 ' || var_count_return_e || ',
-														     ' || var_productcount_return ||',0);';
+														     ' || var_productcount_return ||');';
 		
 														     
---		-- raise notice 'machine_id: %', machine_id;
---		-- raise notice 'kpi_date: %', kpi_date;												     
---		-- raise notice 'kpi_hour: %', kpi_hour;												     
---		-- raise notice 'var_start_time: %', var_start_time;												     
---		-- raise notice 'var_end_time: %', var_end_time;												     
---		-- raise notice 'shift_name: %', shift_name;												     
---		-- raise notice 'var_efficiency_return: %', var_efficiency_return;												     
---		-- raise notice 'var_availability_return: %', var_availability_return;
---		-- raise notice 'var_capacity_potential_return: %', var_capacity_potential_return;												     
---		-- raise notice 'var_throughput_return: %', var_throughput_return;												     
---		-- raise notice 'var_average_machinespeed_return: %', var_average_machinespeed_return;												     
---		-- raise notice 'var_count_return_1x: %', var_count_return_1x;												     
---		-- raise notice 'var_count_return_e: %', var_count_return_e;												     
---		-- raise notice 'var_productcount_return: %', var_productcount_return;												     
+--		-- -- raise notice'machine_id: %', machine_id;
+--		-- -- raise notice'kpi_date: %', kpi_date;												     
+--		-- -- raise notice'kpi_hour: %', kpi_hour;												     
+--		-- -- raise notice'var_start_time: %', var_start_time;												     
+--		-- -- raise notice'var_end_time: %', var_end_time;												     
+--		-- -- raise notice'shift_name: %', shift_name;												     
+--		-- -- raise notice'var_efficiency_return: %', var_efficiency_return;												     
+--		-- -- raise notice'var_availability_return: %', var_availability_return;
+--		-- -- raise notice'var_capacity_potential_return: %', var_capacity_potential_return;												     
+--		-- -- raise notice'var_throughput_return: %', var_throughput_return;												     
+--		-- -- raise notice'var_average_machinespeed_return: %', var_average_machinespeed_return;												     
+--		-- -- raise notice'var_count_return_1x: %', var_count_return_1x;												     
+--		-- -- raise notice'var_count_return_e: %', var_count_return_e;												     
+--		-- -- raise notice'var_productcount_return: %', var_productcount_return;												     
 
 
-     	-- raise notice 'var_sqlquery: %', var_sqlquery;
-		perform dblink_exec('ExternalConnection', var_sqlquery);
-		
-		--raise notice 'var_productcount_return: %', var_productcount_return;
+     	-- -- raise notice'var_sqlquery: %', var_sqlquery;
+		--perform dblink_exec('ExternalConnection', var_sqlquery);
 		
 		
-		TOTALCOUNT := var_productcount_return;
-		REJECTCOUNT := 0;
 		
 	elseif machine_type = 'VS' then
 		
@@ -840,6 +826,7 @@ begin
 
 		-- Property_Name: param_lifetimecycles
 		var_count_last := 0;
+		var_count_return := 0;
 		for prerec in 
 		select time, property_value from value_stream
 		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
@@ -864,9 +851,9 @@ begin
 		----------------------------- Throughput -------------------------------------
 
 		-- Property_Name: param_lifetimecycles
-		var_throughput_return := var_count_return::real * 60 / duration_in_sec;
+		var_throughput_return := var_count_return * 60 / duration_in_sec;
 	
-		var_throughputcycles_return := var_count_return::real * 60 / duration_in_sec;
+		var_throughputcycles_return := var_count_return * 60 / duration_in_sec;
 		
 		
 		------------------------------------- Availability ---------------------------------------
@@ -874,6 +861,7 @@ begin
 		var_last_run_val := '0'; -- setup default value.
 		var_last_stop_val := '0';
 		var_last_alarm_val := '0';
+		var_availability_return := 0.0;
 	
 		select property_value from value_stream
 		into var_last_run_val
@@ -909,7 +897,7 @@ begin
 			order by time
 		LOOP
 			
-			-- -- raise notice '%:% - %:%', var_last_time, var_last_value, rec.time, rec.property_value;
+			-- -- -- -- raise notice'%:% - %:%', var_last_time, var_last_value, rec.time, rec.property_value;
 			if var_last_run_val = 'true' then
 				available_runtime_in_sec := extract(epoch from rec.time - var_last_run_time)+ available_runtime_in_sec;
 			end if;
@@ -954,6 +942,10 @@ begin
 		
 		-- add tail time.
 		if var_last_run_val = 'true' then
+			-- raise notice'rec.time: %', rec.time;
+			-- raise notice'var_last_run_time: %',var_last_run_time;
+			-- raise notice'available_runtime_in_sec: %', available_runtime_in_sec;
+			
 			available_runtime_in_sec := extract(epoch from var_end_time - var_last_run_time)+ available_runtime_in_sec;
 		end if;
 		if var_last_stop_val = 'true' then
@@ -962,7 +954,7 @@ begin
 		if var_last_alarm_val = 'true' then
 			available_alarmtime_in_sec := extract(epoch from var_end_time - var_last_alarm_time)+ available_alarmtime_in_sec;
 		end if;
-		-- -- raise notice 'End at:%', now();
+		-- -- -- -- raise notice'End at:%', now();
 		var_availability_return := (available_runtime_in_sec + available_stoptime_in_sec - available_alarmtime_in_sec)/duration_in_sec;
 	
 
@@ -977,6 +969,7 @@ begin
 		
 		var_idealrunrate := ideal_run_rate;
 		
+		var_capacity_potential_return := 0.0;
 		if available_runtime_in_sec <= 0.0 then
 			var_capacity_potential_return := 0.0;
 		ELSEIF var_idealrunrate <= 0.0 then
@@ -985,102 +978,48 @@ begin
 			var_capacity_potential_return := 1.0 - ((var_count_return * 60 /available_runtime_in_sec) / var_idealrunrate);
 		END IF;
 		
-		
+		-- raise notice'var_count_return: %', var_count_return;
+		-- raise notice'available_runtime_in_sec: %', available_runtime_in_sec;
 		-------------------------------------- Efficiency -------------------------------------
 
 		-- Property_Name: param_utillizationtotal
-		
-		var_efficiency_count := 0;
+		--Weighted Average
 		var_utillizationtotal_last := 0.0;
-
-		for prerec_cycle in 
+		var_efficiency_return := 0.0;
+		for prerec in 
 		select time, property_value from value_stream
-		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
+		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
 		and time <= var_start_time
 		order by time desc limit 1
-		LOOP	
-			var_efficiency_count := var_efficiency_count + 1;
-			for prerec_param in
-			select time, property_value from value_stream
-			where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
-			and time <= prerec_cycle.time
-			order by time desc limit 1
-			LOOP
-			
-				var_utillizationtotal_last := prerec_param.property_value::json->'rows'->0->>'param_utillizationtotal';
-			
-			end LOOP;
+		LOOP
+			-- -- -- raise notice'time: %', prerec.time;
+			var_utillizationtotal_last := prerec.property_value::json->'rows'->0->>'param_utillizationtotal';
 		END LOOP;
-	
+		-- -- -- raise notice'var_utillizationtotal_last: %', var_utillizationtotal_last;
 		
-		for rec_cycle in 
+		var_last_time := var_start_time;
+		var_total := 0.0;
+		
+		-- -- -- raise notice'var_end_time: %', var_end_time;
+		
+		for rec in 
 		select time, property_value from value_stream
-		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
+		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
 		and time < var_end_time and time > var_start_time
 		order by time
 		LOOP
-			var_efficiency_count := var_efficiency_count + 1;
-			for rec_param in
-			select time, property_value from value_stream
-			where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
-			and time <= rec_cycle.time
-			order by time desc limit 1
-			LOOP
-			
-				var_utillizationtotal_last := var_utillizationtotal_last + (prerec_param.property_value::json->'rows'->0->>'param_utillizationtotal')::real;
-				
-			end LOOP;
-			
+			-- -- -- raise notice'param_utillizationtotal: %', rec.property_value::json->'rows'->0->>'param_utillizationtotal';
+			var_time_gap := extract(epoch from rec.time - var_last_time);
+			var_total := var_time_gap * var_utillizationtotal_last + var_total;
 		
-		end LOOP;
-
-		
-		var_efficiency_return := var_utillizationtotal_last / var_efficiency_count;
-
-
-
-
-
-
-
-
---Weighted Average
---		var_utillizationtotal_last := 0.0;
---		
---		for prerec in 
---		select time, property_value from value_stream
---		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
---		and time <= var_start_time
---		order by time desc limit 1
---		LOOP
--- raise notice 'time: %', prerec.time;
---			var_utillizationtotal_last := prerec.property_value::json->'rows'->0->>'param_utillizationtotal';
---		END LOOP;
--- raise notice 'var_utillizationtotal_last: %', var_utillizationtotal_last;
---		
---		var_last_time := var_start_time;
---		var_total := 0.0;
---		
--- raise notice 'var_end_time: %', var_end_time;
---		
---		for rec in 
---		select time, property_value from value_stream
---		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
---		and time < var_end_time and time > var_start_time
---		order by time
---		LOOP
--- raise notice 'param_utillizationtotal: %', rec.property_value::json->'rows'->0->>'param_utillizationtotal';
---			var_time_gap := extract(epoch from rec.time - var_last_time);
---			var_total := var_time_gap * var_utillizationtotal_last + var_total;
---		
---			var_last_time := rec.time;
---			var_utillizationtotal_last := rec.property_value::json->'rows'->0->>'param_utillizationtotal'; -- need string to real convertion?
---		END LOOP;
---	
---		var_total := extract(epoch from var_end_time - var_last_time) * var_utillizationtotal_last + var_total;
--- -- raise notice 'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
---	
---		var_efficiency_return := var_total / duration_in_sec;	
+			var_last_time := rec.time;
+			var_utillizationtotal_last := rec.property_value::json->'rows'->0->>'param_utillizationtotal'; -- need string to real convertion?
+		END LOOP;
+	
+		var_total := extract(epoch from var_end_time - var_last_time) * var_utillizationtotal_last + var_total;
+		-- -- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
+	
+		var_efficiency_return := var_total / duration_in_sec;	
 		
 		
 		
@@ -1088,12 +1027,9 @@ begin
 		------------------------------ Vacuum Deviation ------------------------------
 
 		
-		-- Cycle Based Strict Average
-	
 		var_lifetimecycles_last := 0.0;
-		var_deviation_count := 0;
+		
 		var_deviation_evaluated := false;
-	
 		for prerec in 
 		select time, property_value from value_stream
 		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
@@ -1104,7 +1040,7 @@ begin
 		END LOOP;
 		
 		
-		--var_last_time := var_start_time;
+		var_last_time := var_start_time;
 		var_total := 0.0;
 		var_current_deviation := 0.0;
 		
@@ -1117,8 +1053,7 @@ begin
 			var_current_lifetimecycles := rec.property_value::json->'rows'->0->>'param_lifetimecycles';
 			if var_current_lifetimecycles > var_lifetimecycles_last then
 				var_deviation_evaluated := true;
-				var_deviation_count := var_deviation_count + 1;
-				--var_time_gap := extract(epoch from rec.time - var_last_time);
+				var_time_gap := extract(epoch from rec.time - var_last_time);
 				
 				select a.property_value::real - (rec.property_value::json->'rows'->0->>'param_vacreached')::real
 				into var_current_deviation
@@ -1127,33 +1062,29 @@ begin
 					from value_stream
 					where entity_id=value_stream_name and source_id = machine_id and property_name='recipe_vactarget'
 					and time <= rec.time order by time desc limit 1) as a;
-				----raise notice 'var_current_deviation: %', var_current_deviation;
-				----raise notice 'var_total: %', var_total;
-				--var_total := var_time_gap * var_current_deviation + var_total;
-				var_total := var_total + var_current_deviation;
-	
+				-- -- -- raise notice'var_current_deviation: %', var_current_deviation;
+				-- -- -- raise notice'var_total: %', var_total;
+				var_total := var_time_gap * var_current_deviation + var_total;
 			else
 				var_deviation_evaluated := false;
 			end if;
-			--var_last_time := rec.time;
+			var_last_time := rec.time;
 			var_lifetimecycles_last := var_current_lifetimecycles; -- need string to real convertion?
 		END LOOP;
 		
-		----raise notice 'var_deviation_evaluated: %', var_deviation_evaluated;
+		-- -- -- raise notice'var_deviation_evaluated: %', var_deviation_evaluated;
 		
-		--	if var_deviation_evaluated = true then	
-		--		var_total := extract(epoch from var_end_time - var_last_time) * var_current_deviation + var_total;
-		--	end if;
-		-- --raise notice 'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
-		--raise notice 'var_total: %', var_total;
+		if var_deviation_evaluated = true then	
+			var_total := extract(epoch from var_end_time - var_last_time) * var_current_deviation + var_total;
+		end if;
+		-- -- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
+		-- -- -- raise notice'var_total: %', var_total;
 	
-		var_deviation_return := var_total / var_deviation_count;
+		var_deviation_return := var_total / duration_in_sec;
 		
 		
 		
 		---------------------------- Vacuum Reached ----------------------------
-		
-		-- Cycle Based Strict Average		
 
 		var_vacreached_last := 0.0;
 		for prerec in 
@@ -1165,52 +1096,25 @@ begin
 			var_vacreached_last := prerec.property_value::json->'rows'->0->>'param_vacreached';
 		END LOOP;
 	
-	
-		var_counter := 0;
-		var_total := var_vacreached_last;
+		var_last_time := var_start_time;
+		var_total := 0.0;
 		for rec in 
-			select time, property_value from value_stream
-			where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
-			and time <= var_end_time and time > var_start_time
+		select time, property_value from value_stream
+		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
+		and time < var_end_time and time > var_start_time
+		order by time
 		LOOP
-			var_vacreached_last := rec.property_value::json->'rows'->0->>'param_vacreached';
-			var_total := var_vacreached_last + var_total;
-			var_counter := var_counter + 1;
+		var_time_gap := extract(epoch from rec.time - var_last_time);
+		var_total := var_time_gap * var_vacreached_last + var_total;
+	
+		var_last_time := rec.time;
+		var_vacreached_last := rec.property_value::json->'rows'->0->>'param_vacreached'; -- need string to real convertion?
 		END LOOP;
 	
-		var_vacreached_return := var_total / var_counter;
-
-		
-
---		var_vacreached_last := 0.0;
---		for prerec in 
---		select time, property_value from value_stream
---		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
---		and time <= var_start_time
---		order by time desc limit 1
---		LOOP
---			var_vacreached_last := prerec.property_value::json->'rows'->0->>'param_vacreached';
---		END LOOP;
---	
---		var_last_time := var_start_time;
---		var_total := 0.0;
---		for rec in 
---		select time, property_value from value_stream
---		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
---		and time < var_end_time and time > var_start_time
---		order by time
---		LOOP
---		var_time_gap := extract(epoch from rec.time - var_last_time);
---		var_total := var_time_gap * var_vacreached_last + var_total;
---	
---		var_last_time := rec.time;
---		var_vacreached_last := rec.property_value::json->'rows'->0->>'param_vacreached'; -- need string to real convertion?
---		END LOOP;
---	
---		var_total := extract(epoch from var_end_time - var_last_time) * var_vacreached_last + var_total;
---		-- -- raise notice 'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
---	
---		var_vacreached_return := var_total / duration_in_sec;
+		var_total := extract(epoch from var_end_time - var_last_time) * var_vacreached_last + var_total;
+		-- -- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
+	
+		var_vacreached_return := var_total / duration_in_sec;
 		
 		
 		
@@ -1244,18 +1148,17 @@ begin
 		END LOOP;
 	
 		var_total := extract(epoch from var_end_time - var_last_time) * var_speedcpm_last + var_total;
-		-- -- raise notice 'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
+		-- -- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
 	
 		var_cyclesperminute_return := var_total / duration_in_sec;
 		
 		
 		---------------------------------------- Insert Into Kpi Table ---------------------------------------------------
-		var_sqlquery := 'insert into cognipro.hour_kpiresults(machine_id,
+		var_sqlquery := 'insert into cognipro.minute_kpiresults(machine_id,
 															kpi_date,
-															kpi_hour,
+															kpi_minute,
 															starttime,
 															endtime,
-															shift,
 															kpi_efficiency,
 															kpi_availability,
 															kpi_giveaway,
@@ -1283,13 +1186,13 @@ begin
 															param_lifetimecycles,
 															param_lifetimecycle,
 															param_productcount,
-															kpi_planprodtime) 
+															kpi_planprodtime
+															) 
 													values(''' || machine_id ||''',
 														   ''' || kpi_date ||''',
-														   ''' || kpi_hour ||''', 
+														   ''' || kpi_hour || kpi_minute ||''', 
 														   ''' || var_start_time||''',
 														   ''' || var_end_time||''',
-														   ''' || shift_name || ''',
 															 ' || var_efficiency_return ||',
 															 ' || var_availability_return ||',
 															 0,0,0,0,0,0,0,
@@ -1302,17 +1205,25 @@ begin
 															 ' || var_cyclesperminute_return ||',
 															 0,0,0,0);';
 		
-														     											     
-     	-- raise notice 'var_sqlquery: %', var_sqlquery;
-		perform dblink_exec('ExternalConnection', var_sqlquery);
-		
-		TOTALCOUNT := var_count_return;
-		REJECTCOUNT := 0;
-		
+			
+--		-- raise notice'machine_id: %', machine_id;
+--		-- raise notice'kpi_date: %', kpi_date;												     
+--		-- raise notice'kpi_hour: %', kpi_hour;	
+--		-- raise notice'kpi_minute: %', kpi_minute;												     
+--		-- raise notice'var_start_time: %', var_start_time;												     
+--		-- raise notice'var_end_time: %', var_end_time;												     
+		-- raise notice'var_efficiency_return: %', var_efficiency_return;												     
+		-- raise notice'var_availability_return: %', var_availability_return;
+		-- raise notice'var_capacity_potential_return: %', var_capacity_potential_return;												     
+--		-- raise notice'var_throughput_return: %', var_throughput_return;												     
+--		-- raise notice'var_deviation_return: %', var_deviation_return;												     
+--		-- raise notice'var_throughputcycles_return: %', var_throughputcycles_return;												     
+--		-- raise notice'var_vacreached_return: %', var_vacreached_return;												     
+--		-- raise notice'var_cyclesperminute_return: %', var_cyclesperminute_return;
+     	-- raise notice'var_sqlquery: %', var_sqlquery;
+		--perform dblink_exec('ExternalConnection', var_sqlquery);
 		
 	end if;
-	
-	return next;
 
 
 end;

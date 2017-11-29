@@ -117,6 +117,17 @@ declare
 	var_endremtemppv_average_return real;
 	
 	var_sqlquery varchar(5000);
+	var_channel_last real;
+
+	prerec_cycle record;
+	prerec_param record;
+
+	rec_cycle record;
+	rec_param record;
+
+	var_efficiency_count real;
+	var_deviation_count real;
+	var_counter real;
 	
 	
 
@@ -342,12 +353,31 @@ begin
 		-- -- raise notice'var_faultrate_return: %', var_faultrate_return;
 		
 		------------------------------ Performance ----------------------------------
+		
+		for rec in
+		select field_values from stream 
+		where entity_id=stream_name and source_id=machine_id
+		and time < var_end_time
+		order by time desc limit 1
+		LOOP
+			--raise notice 'prerec: %', prerec.field_values;
+			var_channel_last := prerec.field_values->>'recipe_channelnumber';
+		END LOOP;
+		
+--		select idealrunrate
+--		into var_idealrunrate
+--		from public.irrconfig
+--		where asset_id = machine_id
+--		and channelnumber = var_channel_last::real;
+		
+		var_idealrunrate := ideal_run_rate;
+		
 		if available_runtime_in_sec <= 0.0 then
 			var_performance_return := 0.0;
-		ELSEIF ideal_run_rate <= 0.0 then
+		ELSEIF var_idealrunrate <= 0.0 then
 			var_performance_return := 0.0;
 		ELSE
-			var_performance_return := ((var_total_pack_count * 60 /available_runtime_in_sec) / ideal_run_rate) * 100;
+			var_performance_return := ((var_total_pack_count * 60 /available_runtime_in_sec) / var_idealrunrate) * 100;
 		END IF;
 		
 		-- -- raise notice'var_performance_return: %', var_performance_return;
@@ -686,7 +716,14 @@ begin
 		
 		------------------------------------------ Capacity Potential ------------------------------------------------------------
 
-		var_idealrunrate := ideal_run_rate;	-- this needs to be retrived from additional DB.
+--		select idealrunrate
+--		into var_idealrunrate
+--		from public.irrconfig
+--		where asset_id = machine_id
+--		and channelnumber = 1;
+		
+		var_idealrunrate := ideal_run_rate;
+		
 		if available_runtime_in_sec <= 0.0 then
 			var_capacity_potential_return := 0.0;
 		ELSEIF var_idealrunrate <= 0.0 then
@@ -701,7 +738,7 @@ begin
 		----------------------------- Efficiency -------------------------------------
 		if machine_type = 'VR8600E' then
 		
-			if var_count_return > 0 then
+			if var_count_return_e > 0 then
 				var_efficiency_return := var_productcount_return * 1.0 / var_count_return_e;
 			ELSE
 				var_efficiency_return := 0.0;
@@ -709,7 +746,7 @@ begin
 			
 		elseif machine_type = 'VR86001X' then
 		
-			if var_count_return > 0 then
+			if var_count_return_1x > 0 then
 				var_efficiency_return := var_productcount_return * 1.0 / var_count_return_1x;
 			ELSE
 				var_efficiency_return := 0.0;
@@ -930,7 +967,14 @@ begin
 		
 		------------------------------------------ Capacity Potential ------------------------------------------------------------
 
+--		select idealrunrate
+--		into var_idealrunrate
+--		from public.irrconfig
+--		where asset_id = machine_id
+--		and channelnumber = 1;
+		
 		var_idealrunrate := ideal_run_rate;
+		
 		var_capacity_potential_return := 0.0;
 		if available_runtime_in_sec <= 0.0 then
 			var_capacity_potential_return := 0.0;
@@ -944,44 +988,100 @@ begin
 		-- raise notice'available_runtime_in_sec: %', available_runtime_in_sec;
 		-------------------------------------- Efficiency -------------------------------------
 
-		-- Property_Name: param_utillizationtotal
-		--Weighted Average
+		-- Property_Name: param_utillizationtotal --- Cycle Based Strict Average
+		
+		var_efficiency_count := 0;
 		var_utillizationtotal_last := 0.0;
-		var_efficiency_return := 0.0;
-		for prerec in 
+
+		for prerec_cycle in 
 		select time, property_value from value_stream
-		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
+		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
 		and time <= var_start_time
 		order by time desc limit 1
-		LOOP
-			-- -- -- raise notice'time: %', prerec.time;
-			var_utillizationtotal_last := prerec.property_value::json->'rows'->0->>'param_utillizationtotal';
+		LOOP	
+			var_efficiency_count := var_efficiency_count + 1;
+			for prerec_param in
+			select time, property_value from value_stream
+			where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
+			and time <= prerec_cycle.time
+			order by time desc limit 1
+			LOOP
+			
+				var_utillizationtotal_last := prerec_param.property_value::json->'rows'->0->>'param_utillizationtotal';
+			
+			end LOOP;
 		END LOOP;
-		-- -- -- raise notice'var_utillizationtotal_last: %', var_utillizationtotal_last;
+	
 		
-		var_last_time := var_start_time;
-		var_total := 0.0;
-		
-		-- -- -- raise notice'var_end_time: %', var_end_time;
-		
-		for rec in 
+		for rec_cycle in 
 		select time, property_value from value_stream
-		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
+		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
 		and time < var_end_time and time > var_start_time
 		order by time
 		LOOP
-			-- -- -- raise notice'param_utillizationtotal: %', rec.property_value::json->'rows'->0->>'param_utillizationtotal';
-			var_time_gap := extract(epoch from rec.time - var_last_time);
-			var_total := var_time_gap * var_utillizationtotal_last + var_total;
+			var_efficiency_count := var_efficiency_count + 1;
+			for rec_param in
+			select time, property_value from value_stream
+			where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
+			and time <= rec_cycle.time
+			order by time desc limit 1
+			LOOP
+			
+				var_utillizationtotal_last := var_utillizationtotal_last + (prerec_param.property_value::json->'rows'->0->>'param_utillizationtotal')::real;
+				
+			end LOOP;
+			
 		
-			var_last_time := rec.time;
-			var_utillizationtotal_last := rec.property_value::json->'rows'->0->>'param_utillizationtotal'; -- need string to real convertion?
-		END LOOP;
-	
-		var_total := extract(epoch from var_end_time - var_last_time) * var_utillizationtotal_last + var_total;
-		-- -- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
-	
-		var_efficiency_return := var_total / duration_in_sec;	
+		end LOOP;
+
+		
+		var_efficiency_return := var_utillizationtotal_last / var_efficiency_count;
+
+
+
+
+
+
+
+
+
+--Weighted Average
+--		var_utillizationtotal_last := 0.0;
+--		var_efficiency_return := 0.0;
+--		for prerec in 
+--		select time, property_value from value_stream
+--		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
+--		and time <= var_start_time
+--		order by time desc limit 1
+--		LOOP
+-- -- -- raise notice'time: %', prerec.time;
+--			var_utillizationtotal_last := prerec.property_value::json->'rows'->0->>'param_utillizationtotal';
+--		END LOOP;
+-- -- -- raise notice'var_utillizationtotal_last: %', var_utillizationtotal_last;
+--		
+--		var_last_time := var_start_time;
+--		var_total := 0.0;
+--		
+-- -- -- raise notice'var_end_time: %', var_end_time;
+--		
+--		for rec in 
+--		select time, property_value from value_stream
+--		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_ProductLoadDone' and property_value::json->'rows'->0->>'param_utillizationtotal' <> '999'
+--		and time < var_end_time and time > var_start_time
+--		order by time
+--		LOOP
+-- -- -- raise notice'param_utillizationtotal: %', rec.property_value::json->'rows'->0->>'param_utillizationtotal';
+--			var_time_gap := extract(epoch from rec.time - var_last_time);
+--			var_total := var_time_gap * var_utillizationtotal_last + var_total;
+--		
+--			var_last_time := rec.time;
+--			var_utillizationtotal_last := rec.property_value::json->'rows'->0->>'param_utillizationtotal'; -- need string to real convertion?
+--		END LOOP;
+--	
+--		var_total := extract(epoch from var_end_time - var_last_time) * var_utillizationtotal_last + var_total;
+-- -- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
+--	
+--		var_efficiency_return := var_total / duration_in_sec;	
 		
 		
 		
@@ -989,9 +1089,12 @@ begin
 		------------------------------ Vacuum Deviation ------------------------------
 
 		
+		-- Cycle Based Strict Average
+	
 		var_lifetimecycles_last := 0.0;
-		
+		var_deviation_count := 0;
 		var_deviation_evaluated := false;
+	
 		for prerec in 
 		select time, property_value from value_stream
 		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
@@ -1002,7 +1105,7 @@ begin
 		END LOOP;
 		
 		
-		var_last_time := var_start_time;
+		--var_last_time := var_start_time;
 		var_total := 0.0;
 		var_current_deviation := 0.0;
 		
@@ -1015,7 +1118,8 @@ begin
 			var_current_lifetimecycles := rec.property_value::json->'rows'->0->>'param_lifetimecycles';
 			if var_current_lifetimecycles > var_lifetimecycles_last then
 				var_deviation_evaluated := true;
-				var_time_gap := extract(epoch from rec.time - var_last_time);
+				var_deviation_count := var_deviation_count + 1;
+				--var_time_gap := extract(epoch from rec.time - var_last_time);
 				
 				select a.property_value::real - (rec.property_value::json->'rows'->0->>'param_vacreached')::real
 				into var_current_deviation
@@ -1024,29 +1128,32 @@ begin
 					from value_stream
 					where entity_id=value_stream_name and source_id = machine_id and property_name='recipe_vactarget'
 					and time <= rec.time order by time desc limit 1) as a;
-				-- -- -- raise notice'var_current_deviation: %', var_current_deviation;
-				-- -- -- raise notice'var_total: %', var_total;
-				var_total := var_time_gap * var_current_deviation + var_total;
+				----raise notice 'var_current_deviation: %', var_current_deviation;
+				----raise notice 'var_total: %', var_total;
+				--var_total := var_time_gap * var_current_deviation + var_total;
+				var_total := var_total + var_current_deviation;
+	
 			else
 				var_deviation_evaluated := false;
 			end if;
-			var_last_time := rec.time;
+			--var_last_time := rec.time;
 			var_lifetimecycles_last := var_current_lifetimecycles; -- need string to real convertion?
 		END LOOP;
 		
-		-- -- -- raise notice'var_deviation_evaluated: %', var_deviation_evaluated;
+		----raise notice 'var_deviation_evaluated: %', var_deviation_evaluated;
 		
-		if var_deviation_evaluated = true then	
-			var_total := extract(epoch from var_end_time - var_last_time) * var_current_deviation + var_total;
-		end if;
-		-- -- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
-		-- -- -- raise notice'var_total: %', var_total;
+		--	if var_deviation_evaluated = true then	
+		--		var_total := extract(epoch from var_end_time - var_last_time) * var_current_deviation + var_total;
+		--	end if;
+		-- --raise notice 'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
+		--raise notice 'var_total: %', var_total;
 	
-		var_deviation_return := var_total / duration_in_sec;
+		var_deviation_return := var_total / var_deviation_count;
 		
 		
 		
 		---------------------------- Vacuum Reached ----------------------------
+		-- Cycle Based Strict Average		
 
 		var_vacreached_last := 0.0;
 		for prerec in 
@@ -1058,25 +1165,54 @@ begin
 			var_vacreached_last := prerec.property_value::json->'rows'->0->>'param_vacreached';
 		END LOOP;
 	
-		var_last_time := var_start_time;
-		var_total := 0.0;
-		for rec in 
-		select time, property_value from value_stream
-		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
-		and time < var_end_time and time > var_start_time
-		order by time
-		LOOP
-		var_time_gap := extract(epoch from rec.time - var_last_time);
-		var_total := var_time_gap * var_vacreached_last + var_total;
 	
-		var_last_time := rec.time;
-		var_vacreached_last := rec.property_value::json->'rows'->0->>'param_vacreached'; -- need string to real convertion?
+		var_counter := 0;
+		var_total := var_vacreached_last;
+		for rec in 
+			select time, property_value from value_stream
+			where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
+			and time <= var_end_time and time > var_start_time
+		LOOP
+			var_vacreached_last := rec.property_value::json->'rows'->0->>'param_vacreached';
+			var_total := var_vacreached_last + var_total;
+			var_counter := var_counter + 1;
 		END LOOP;
 	
-		var_total := extract(epoch from var_end_time - var_last_time) * var_vacreached_last + var_total;
-		-- -- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
-	
-		var_vacreached_return := var_total / duration_in_sec;
+		var_vacreached_return := var_total / var_counter;
+
+
+
+
+--
+--		var_vacreached_last := 0.0;
+--		for prerec in 
+--		select time, property_value from value_stream
+--		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
+--		and time <= var_start_time
+--		order by time desc limit 1
+--		LOOP
+--			var_vacreached_last := prerec.property_value::json->'rows'->0->>'param_vacreached';
+--		END LOOP;
+--	
+--		var_last_time := var_start_time;
+--		var_total := 0.0;
+--		for rec in 
+--		select time, property_value from value_stream
+--		where entity_id=value_stream_name and source_id = machine_id and property_name='infotable_VacComplete'
+--		and time < var_end_time and time > var_start_time
+--		order by time
+--		LOOP
+--		var_time_gap := extract(epoch from rec.time - var_last_time);
+--		var_total := var_time_gap * var_vacreached_last + var_total;
+--	
+--		var_last_time := rec.time;
+--		var_vacreached_last := rec.property_value::json->'rows'->0->>'param_vacreached'; -- need string to real convertion?
+--		END LOOP;
+--	
+--		var_total := extract(epoch from var_end_time - var_last_time) * var_vacreached_last + var_total;
+--		-- -- -- -- raise notice'Final total:(%) and average:(%)', var_total_distince, var_total_distince / duration_in_sec;
+--	
+--		var_vacreached_return := var_total / duration_in_sec;
 		
 		
 		

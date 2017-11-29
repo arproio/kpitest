@@ -36,7 +36,7 @@ declare
 	var_throughput_return	real;		-- return value
 	var_availability_return real;		-- return value
 
-	var_idearunrate	integer;
+	var_idealrunrate	integer;
 	var_capacitypotential_return	real;	-- return value
 	var_efficiency_return	real;		-- return value
 	
@@ -315,13 +315,18 @@ begin
 		
 		
 		-- Property_Name: param_productcount
-		var_idearunrate := ideal_run_rate;	-- this needs to be retrived from additional DB.
+		select idealrunrate
+		into var_idealrunrate
+		from public.irrconfig
+		where asset_id = machine_id
+		and channelnumber = 1;
+		
 		if available_runtime_in_sec <= 0.0 then
 			var_capacitypotential_return := 0.0;
-		ELSEIF var_idearunrate <= 0.0 then
+		ELSEIF var_idealrunrate <= 0.0 then
 			var_capacitypotential_return := 0.0;
 		ELSE
-			var_capacitypotential_return := 1.0 - ((var_productcount_capacity_potential * 60 /available_runtime_in_sec) / var_idearunrate);
+			var_capacitypotential_return := 1.0 - ((var_productcount_capacity_potential * 60 /available_runtime_in_sec) / var_idealrunrate);
 		END IF;
 	end if;
 	----------------------------- Efficiency -------------------------------------

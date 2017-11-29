@@ -2,7 +2,7 @@ CREATE TABLE cognipro.shift_kpiresults (
 	dailyshift_id varchar NOT NULL,
 	shiftname varchar NULL,
 	machine_id varchar NOT NULL,
-	starttime timestamptz NULL,
+	starttime timestamptz NOT NULL,
 	endtime timestamptz NULL,
 	kpi_efficiency float4 NULL,
 	kpi_availability float4 NULL,
@@ -32,7 +32,7 @@ CREATE TABLE cognipro.shift_kpiresults (
 	param_lifetimecycles float4 NULL,
 	param_lifetimecycle float4 NULL,
 	param_productcount float4 NULL,
-	CONSTRAINT shift_kpiresults_pk PRIMARY KEY (dailyshift_id,machine_id)
+	CONSTRAINT shift_kpiresults_pk PRIMARY KEY (machine_id,starttime)
 )
 WITH (
 	OIDS=FALSE

@@ -18,6 +18,9 @@ declare
 	duration_in_sec integer;
 	var_planned_production_time_in_sec integer;
 	var_last_time timestamp with time zone;
+	var_last_run_time timestamp with time zone;
+	var_last_stop_time timestamp with time zone;
+
 	var_last_value character varying;
 	rec RECORD;
 	prerec RECORD;
@@ -116,7 +119,7 @@ begin
 	select into var_shift_start_time (to_timestamp(start_time_string,'YYYYMMDDHH24MISS')::timestamp with time zone) ;
 
 	duration_in_sec := extract('epoch' from (var_end_time - var_start_time));
-	var_planned_production_time_in_sec := extract('epoch' from (var_end_time - var_shift_start_time));
+	var_planned_production_time_in_sec := extract('epoch' from (var_end_time - var_start_time));
 	
 
 	IF duration_in_sec <=0 then
@@ -224,8 +227,9 @@ begin
 		order by time desc limit 1;
 		
 		
-		var_last_time := var_availability_start_time;	-- setup start time in loop.
-	
+		var_last_run_time := var_availability_start_time;	-- setup start time in loop.
+		var_last_stop_time := var_availability_start_time;
+		
 		available_runtime_in_sec = 0.0;
 		available_stoptime_in_sec = 0.0;
 	
@@ -238,10 +242,10 @@ begin
 			
 			-- RAISE NOTICE '%:% - %:%', var_last_time, var_last_value, rec.time, rec.property_value;
 			if var_last_run_val = 'true' then
-				available_runtime_in_sec := extract(epoch from rec.time - var_last_time)+ available_runtime_in_sec;
+				available_runtime_in_sec := extract(epoch from rec.time - var_last_run_time)+ available_runtime_in_sec;
 			end if;
 			
-			var_last_time := rec.time;
+			var_last_run_time := rec.time;
 			var_last_run_val := rec.field_values->>'state_machinerunning';
 		
 		END LOOP;
@@ -254,21 +258,21 @@ begin
 		LOOP
 			
 			if var_last_stop_val = 'true' then
-				available_stoptime_in_sec := extract(epoch from rec.time - var_last_time)+ available_stoptime_in_sec;
+				available_stoptime_in_sec := extract(epoch from rec.time - var_last_stop_time)+ available_stoptime_in_sec;
 			end if;
 			
 			
-			var_last_time := rec.time;
-			var_last_run_val := rec.field_values->>'state_machinestopped';
+			var_last_stop_time := rec.time;
+			var_last_stop_val := rec.field_values->>'state_machinestopped';
 		
 		END LOOP;
 		
 		-- add tail time.
 		if var_last_run_val = 'true' then
-			available_runtime_in_sec := extract(epoch from rec.time - var_last_time)+ available_runtime_in_sec;
+			available_runtime_in_sec := extract(epoch from var_end_time - var_last_run_time)+ available_runtime_in_sec;
 		end if;
 		if var_last_stop_val = 'true' then
-			available_stoptime_in_sec := extract(epoch from rec.time - var_last_time)+ available_stoptime_in_sec;
+			available_stoptime_in_sec := extract(epoch from var_end_time - var_last_stop_time)+ available_stoptime_in_sec;
 		end if;
 	
 		-- raise notice 'End at:%', now();
@@ -282,7 +286,7 @@ begin
 	for prerec in 
 	select field_values from stream 
 	where entity_id=value_stream_name and source_id=machine_id
-	and time <= var_shift_start_time
+	and time <= var_start_time
 	order by time desc limit 1
 	LOOP
 	var_count_last := prerec.field_values->>'param_totalpackcount';
@@ -293,7 +297,7 @@ begin
 	for rec in 
 	select field_values from stream 
 	where entity_id=value_stream_name and source_id=machine_id
-	and time < var_end_time and time > var_shift_start_time
+	and time < var_end_time and time > var_start_time
 	order by time desc limit 1
 	LOOP
 	var_count_end := rec.field_values->>'param_totalpackcount'; -- need string to real convertion?
@@ -319,7 +323,7 @@ begin
 	for rec in 
 		select time,field_values from stream 
 		where entity_id=value_stream_name and source_id=machine_id
-		and time < var_end_time and time > var_shift_start_time
+		and time < var_end_time and time > var_start_time
 		order by time
 	LOOP
 		
@@ -379,19 +383,19 @@ begin
 	for prerec in
 		select time,field_values from stream 
 		where entity_id=value_stream_name and source_id=machine_id
-		and time <= var_shift_start_time
+		and time <= var_start_time
 		order by time desc limit 1
 	LOOP
 		var_last_value := prerec.field_values->>'state_machinefaulted';
 	END LOOP;
-	var_last_time := var_shift_start_time;	-- setup start time in loop.
+	var_last_time := var_start_time;	-- setup start time in loop.
 
 	available_faulttime_in_sec = 0.0;
 	
 	for rec in 
 		select time,field_values from stream 
 		where entity_id=value_stream_name and source_id=machine_id
-		and time < var_end_time and time > var_shift_start_time
+		and time < var_end_time and time > var_start_time
 		order by time
 	LOOP
 		if var_last_value = 'true' then
@@ -405,7 +409,7 @@ begin
 		available_faulttime_in_sec := extract(epoch from var_end_time - var_last_time)+ available_faulttime_in_sec;
 	END IF;
 	-- raise notice 'End at:%', now();
-	var_faultrate_return := available_faulttime_in_sec / var_planned_production_time_in_sec;
+	var_faultrate_return := available_faulttime_in_sec / duration_in_sec;
 	
 	raise notice 'var_faultrate_return: %', var_faultrate_return;
 	
@@ -471,6 +475,9 @@ begin
 		if var_last_value = 'true' then
 			available_runtime_in_sec := extract(epoch from var_end_time - var_last_time)+ available_runtime_in_sec;
 		END IF;
+		
+		-- Need to get channel from db
+		
 		
 		if available_runtime_in_sec <= 0.0 then
 			var_performance_return := 0.0;
